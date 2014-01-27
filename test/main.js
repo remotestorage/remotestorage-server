@@ -92,22 +92,49 @@ exports['scopes'] = nodeunit.testCase({
   },
   'exists': function (test) {
     setUp.bind(this)();
+    test.equal(this.mainInstance.exists('/me/'), true);
+    test.equal(this.mainInstance.exists('/me/a'), true);
+    test.equal(this.mainInstance.exists('/me/existing'), true);
+    test.equal(this.mainInstance.exists('/me/non-existing'), false);
+    test.equal(this.mainInstance.exists('/me/non/existing'), false);
+    test.equal(this.mainInstance.exists('/me/non-existing/'), false);
+    test.equal(this.mainInstance.exists('/me/non/existing/'), false);
     test.done();
   },
   'getContent': function (test) {
     setUp.bind(this)();
+    test.equal(this.mainInstance.getContent('/me/a'), this.dataStore._data['content:/me/a']);
+    test.equal(this.mainInstance.getContent('/me/non-existing'), undefined);
     test.done();
   },
   'getContentType': function (test) {
     setUp.bind(this)();
+    test.equal(this.mainInstance.getContentType('/me/a'), this.dataStore._data['contentType:/me/a']);
+    test.equal(this.mainInstance.getContentType('/me/non-existing'), undefined);
     test.done();
   },
-  'getVersion': function (test) {
+  'getContentLength': function (test) {
     setUp.bind(this)();
+    test.equal(this.mainInstance.getContentLength('/me/a'), 4);
+    test.equal(this.mainInstance.getContentLength('/me/non-existing'), undefined);
+    test.done();
+  },
+  'getRevision': function (test) {
+    setUp.bind(this)();
+    test.equal(this.mainInstance.getRevision('/me/a'), this.dataStore._data['revision:/me/a']);
+    test.equal(this.mainInstance.getRevision('/me/non-existing'), undefined);
     test.done();
   },
   'set': function (test) {
     setUp.bind(this)();
+    this.mainInstance.set('/me/a', new Buffer('hi', 'utf-8'), new Buffer('hi', 'utf-8'), new Buffer('123', 'utf-8'));
+    this.mainInstance.set('/me/c', new Buffer('ho', 'utf-8'), new Buffer('ho', 'utf-8'), new Buffer('456', 'utf-8'));
+    test.deepEqual(this.dataStore._data['content:/me/a'], new Buffer('hi', 'utf-8'));
+    test.deepEqual(this.dataStore._data['contentType:/me/a'], new Buffer('hi', 'utf-8'));
+    test.deepEqual(this.dataStore._data['revision:/me/a'], new Buffer('123', 'utf-8'));
+    test.deepEqual(this.dataStore._data['content:/me/c'], new Buffer('ho', 'utf-8'));
+    test.deepEqual(this.dataStore._data['contentType:/me/c'], new Buffer('ho', 'utf-8'));
+    test.deepEqual(this.dataStore._data['revision:/me/c'], new Buffer('456', 'utf-8'));
     test.done();
   }
 });
