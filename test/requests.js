@@ -63,13 +63,26 @@ exports['main'] = nodeunit.testCase({
       'content-length': '4'
     });
     test.equal(this.res._body, 'asdf');
+    test.done();
+  },
+  'writeRaw': function (test) {
+    setUp.bind(this)();
+    this.requestsInstance.respond(this.res, 'application/json', 'https://foo.bar', 408, '123');
+    test.equal(this.res._status, 408);
+    test.deepEqual(this.res._headers, {
+      'Access-Control-Allow-Origin': 'https://foo.bar',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+      'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+      'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+      Expires: '0',
+      etag: '"123"'
+    });
+    test.equal(this.res._body, '');
     test.equal(this.res._ended, true);
     test.done();
   }
 });
 /*
-  function writeHead(res, status, origin, revision, contentType, contentLength) {
-  function writeRaw(res, contentType, content, origin, revision) {
   function respond(res, origin, status, etag) {
   function checkNoFolder(req, res, path) {
   function checkMayRead(req, res, path) {
