@@ -21,11 +21,6 @@ exports['createServer supports version string "draft-dejong-remotestorage-03"'] 
   test.done();
 };
 exports['createServer throws an error for unknown version strings'] = function (test) {
-  var server;
-  try {
-    server = remotestorageServer.createServer('draft-dejong-remotestorage-04', {}, {});
-  } catch(e) {
-    test.equal(e.toString(), 'Error: unknown spec version "draft-dejong-remotestorage-04"');
-    test.done();
-  }
+  test.throws(function() {remotestorageServer.createServer('draft-dejong-remotestorage-04', {}, {})});
+  test.done();
 };
