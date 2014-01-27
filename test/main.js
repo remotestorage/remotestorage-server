@@ -50,12 +50,12 @@ exports['scopes'] = nodeunit.testCase({
         a: {
           ETag: 'a',
           'Content-Type': 'a-ish',
-          'Content-Length': 5
+          'Content-Length': 4
         },
         b: {
           ETag: 'b',
           'Content-Type': 'b-ish',
-          'Content-Length': 7
+          'Content-Length': 8
         }
       }
     });
@@ -74,12 +74,12 @@ exports['scopes'] = nodeunit.testCase({
         a: {
           ETag: 'a',
           'Content-Type': 'a-ish',
-          'Content-Length': 5
+          'Content-Length': 4
         },
         b: {
           ETag: 'b',
           'Content-Type': 'b-ish',
-          'Content-Length': 7
+          'Content-Length': 8
         },
         existing: {
           ETag: 'hi',
