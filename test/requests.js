@@ -3,8 +3,26 @@ var requests = require('../lib/requests'),
   
 function setUp() {
   this.scopesMock = {
+    _mayReadCalled: 0,
+    _mayWriteCalled: 0,
+    mayRead: function(authHeader, path) {
+      this._mayReadCalled++;
+      return (authHeader === 'asdfqwer-read' && path === '/qwer/asdf/read');
+    },
+    mayWrite: function(authHeader, path) {
+      this._mayWriteCalled++;
+      return (authHeader === 'asdfqwer-write' && path === '/qwer/asdf/write');
+    }
   };
   this.mainMock = {
+    _condMet: 0,
+    condMet: function(cond, path) {
+      this._condMetCalled++;
+      return (cond['If-None-Match'] === '*' && path === '/qwer/asdf/cond');
+    },
+    getRevision: function(path) {
+      return 'koe';
+    }
   };
   this.res = {
     _status: undefined,
@@ -18,8 +36,16 @@ function setUp() {
     write: function(buf) {
       this._body += buf.toString();
     },
-    end: function() {
+    end: function(buf) {
+      if (buf) {
+        this._body += buf.toString();
+      }
       this._ended = true;
+    }
+  };
+  this.req = {
+    headers: {
+      origin: 'http://local.host'
     }
   };
   this.requestsInstance = requests.createInstance(this.scopesMock, this.mainMock);
@@ -65,9 +91,9 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._body, 'asdf');
     test.done();
   },
-  'writeRaw': function (test) {
+  'respond': function (test) {
     setUp.bind(this)();
-    this.requestsInstance.respond(this.res, 'application/json', 'https://foo.bar', 408, '123');
+    this.requestsInstance.respond(this.res, 'https://foo.bar', 408, '123');
     test.equal(this.res._status, 408);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
@@ -75,18 +101,112 @@ exports['main'] = nodeunit.testCase({
       'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
       'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
       Expires: '0',
-      etag: '"123"'
+      etag: '"123"',
+      'content-type': 'text/plain',
+      'content-length': '20'
     });
+    test.equal(this.res._body, '408 Computer says no');
+    test.equal(this.res._ended, true);
+    test.done();
+  },
+  'checkNoFolder': function (test) {
+    setUp.bind(this)();
+    this.requestsInstance.checkNoFolder(this.req, this.res, '/me/foo');
+    test.equal(this.res._headers, undefined);
     test.equal(this.res._body, '');
+    test.equal(this.res._ended, false);
+    test.equal(this.requestsInstance.checkNoFolder(this.req, this.res, '/me/foo/'), undefined);
+    test.deepEqual(this.res._headers, {
+      'Access-Control-Allow-Origin': 'http://local.host',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+      'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+      'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+      Expires: '0',
+      'content-type': 'text/plain',
+      'content-length': '20'
+    });
+    test.equal(this.res._body, '400 Computer says no');
+    test.equal(this.res._ended, true);
+    test.done();
+  },
+  'checkMayRead': function (test) {
+    setUp.bind(this)();
+    this.req.headers.authorization = 'asdfqwer-read';
+    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, '/qwer/asdf/read'), true);
+    test.equal(this.scopesMock._mayReadCalled, 1);
+    test.equal(this.res._status, undefined);
+    test.equal(this.res._headers, undefined);
+    test.equal(this.res._body, '');
+    test.equal(this.res._ended, false);
+    this.req.headers.authorization = 'asdfqwer-wrong';
+    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, '/qwer/asdf/read'), undefined);
+    test.equal(this.scopesMock._mayReadCalled, 2);
+    test.equal(this.res._status, 401);
+    test.deepEqual(this.res._headers, {
+      "Access-Control-Allow-Origin":"http://local.host",
+      "Access-Control-Allow-Headers":"Content-Type, Authorization, Origin, If-Match, If-None-Match",
+      "Access-Control-Expose-Headers":"Content-Type, Content-Length, ETag",
+      "Access-Control-Allow-Methods":"GET, PUT, DELETE",
+      "Expires":"0",
+      "content-type":"text/plain",
+      "content-length":"16"});
+    test.equal(this.res._body, '401 Unauthorized');
+    test.equal(this.res._ended, true);
+    test.done();
+  },
+  'checkMayWrite': function (test) {
+    setUp.bind(this)();
+    this.req.headers.authorization = 'asdfqwer-write';
+    test.equal(this.requestsInstance.checkMayWrite(this.req, this.res, '/qwer/asdf/write'), true);
+    test.equal(this.scopesMock._mayWriteCalled, 1);
+    test.equal(this.res._status, undefined);
+    test.equal(this.res._headers, undefined);
+    test.equal(this.res._body, '');
+    test.equal(this.res._ended, false);
+    this.req.headers.authorization = 'asdfqwer-wrong';
+    test.equal(this.requestsInstance.checkMayWrite(this.req, this.res, '/qwer/asdf/write'), undefined);
+    test.equal(this.scopesMock._mayWriteCalled, 2);
+    test.equal(this.res._status, 401);
+    test.deepEqual(this.res._headers, {
+      "Access-Control-Allow-Origin":"http://local.host",
+      "Access-Control-Allow-Headers":"Content-Type, Authorization, Origin, If-Match, If-None-Match",
+      "Access-Control-Expose-Headers":"Content-Type, Content-Length, ETag",
+      "Access-Control-Allow-Methods":"GET, PUT, DELETE",
+      "Expires":"0",
+      "content-type":"text/plain",
+      "content-length":"16"});
+    test.equal(this.res._body, '401 Unauthorized');
+    test.equal(this.res._ended, true);
+    test.done();
+  },
+  'checkCondMet': function (test) {
+    setUp.bind(this)();
+    this.req.headers['if-none-match'] = '*';
+    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, '/qwer/asdf/cond'), true);
+    test.equal(this.scopesMock._condMetCalled, 1);
+    test.equal(this.res._status, undefined);
+    test.equal(this.res._headers, undefined);
+    test.equal(this.res._body, '');
+    test.equal(this.res._ended, false);
+    this.req.headers.authorization = 'asdfqwer-wrong';
+    this.req.headers['if-match'] = 'aap';
+    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, '/qwer/asdf/cond'), undefined);
+    test.equal(this.scopesMock._condMetCalled, 2);
+    test.equal(this.res._status, 412);
+    test.deepEqual(this.res._headers, {
+      "Access-Control-Allow-Origin":"http://local.host",
+      "Access-Control-Allow-Headers":"Content-Type, Authorization, Origin, If-Match, If-None-Match",
+      "Access-Control-Expose-Headers":"Content-Type, Content-Length, ETag",
+      "Access-Control-Allow-Methods":"GET, PUT, DELETE",
+      "Expires":"0",
+      "content-type":"text/plain",
+      "content-length":"16"});
+    test.equal(this.res._body, '412 Precondition failed');
     test.equal(this.res._ended, true);
     test.done();
   }
 });
 /*
-  function respond(res, origin, status, etag) {
-  function checkNoFolder(req, res, path) {
-  function checkMayRead(req, res, path) {
-  function checkMayWrite(req, res, path) {
   function checkCondMet(req, res, path) {
   function checkFound(req, res, path) {
   function doHead(req, res, path) {
