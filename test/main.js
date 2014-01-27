@@ -23,7 +23,7 @@ function setUp() {
   };
 }
 
-exports['scopes'] = nodeunit.testCase({
+exports['main'] = nodeunit.testCase({
   /*setUp: function() {
   },
   tearDown: function() {
