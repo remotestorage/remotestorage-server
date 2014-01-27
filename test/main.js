@@ -10,8 +10,8 @@ function setUp() {
   this.mainInstance = main.createInstance(this.dataStore);
   this.dataStore._data = {
     'content:/me/': {a: true, b: true, existing: true},
-    'content:/me/a': new Buffer('blÄ', 'utf-8'),
-    'content:/me/b': new Buffer('UnhoÅ', 'utf-8'),
+    'content:/me/a': new Buffer('blÄ³', 'utf-8'),
+    'content:/me/b': new Buffer('UnhoÅ¡Å¥', 'utf-8'),
     'content:/me/existing': 'hi',
     'contentType:/me/a': 'a-ish',
     'contentType:/me/b': 'b-ish',
