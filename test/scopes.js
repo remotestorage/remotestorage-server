@@ -7,11 +7,6 @@ function setUp() {
     get: function(key) { return this._data[key]; },
     set: function(key, value) { this._data[key] = value; }
   };
-  this.dataStore = {
-    _data: {},
-    get: function(key) { return this._data[key]; },
-    set: function(key, value) { this._data[key] = value; }
-  };
   this.scopesInstance = scopes.createInstance(this.tokenStore);
 }
 
