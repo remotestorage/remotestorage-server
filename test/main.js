@@ -28,22 +28,22 @@ exports['main'] = nodeunit.testCase({
   },
   tearDown: function() {
   },*/
-  'condMet': function (test) {
+  'condMet': function(test) {
     setUp.bind(this)();
     test.equal(this.mainInstance.condMet({ifNoneMatch: '*'}, 'me/existing'), false);
     test.equal(this.mainInstance.condMet({ifNoneMatch: '*'}, 'me/non-existing'), true);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: 'ho'}, 'me/existing'), true);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: 'he,ho'}, 'me/existing'), true);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: 'hi'}, 'me/existing'), false);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: 'he,hi'}, 'me/existing'), false);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: 'ho'}, 'me/non-existing'), true);
-    test.equal(this.mainInstance.condMet({ifMatch: 'hi'}, 'me/existing'), true);
-    test.equal(this.mainInstance.condMet({ifMatch: 'ho'}, 'me/existing'), false);
-    test.equal(this.mainInstance.condMet({ifMatch: 'hi'}, 'me/non-existing'), false);
+    test.equal(this.mainInstance.condMet({ifNoneMatch: ['ho']}, 'me/existing'), true);
+    test.equal(this.mainInstance.condMet({ifNoneMatch: ['he', 'ho']}, 'me/existing'), true);
+    test.equal(this.mainInstance.condMet({ifNoneMatch: ['hi']}, 'me/existing'), false);
+    test.equal(this.mainInstance.condMet({ifNoneMatch: ['he', 'hi']}, 'me/existing'), false);
+    test.equal(this.mainInstance.condMet({ifNoneMatch: ['ho']}, 'me/non-existing'), true);
+    test.equal(this.mainInstance.condMet({ifMatch: ['hi']}, 'me/existing'), true);
+    test.equal(this.mainInstance.condMet({ifMatch: ['ho']}, 'me/existing'), false);
+    test.equal(this.mainInstance.condMet({ifMatch: ['hi']}, 'me/non-existing'), false);
     test.equal(this.mainInstance.condMet({ ifNoneMatch: undefined, ifMatch: undefined }, 'me/existing'), true);
     test.done();
   },
-  'revisionsToMap': function (test) {
+  'revisionsToMap': function(test) {
     setUp.bind(this)();
     test.deepEqual(this.mainInstance.revisionsToMap({ a: 'a', b: 'b'}, 'me/'), {
       '@context': 'http://remotestorage.io/spec/folder-description',
@@ -62,7 +62,7 @@ exports['main'] = nodeunit.testCase({
     });
     test.done();
   },
-  'getFolderDescription': function (test) {
+  'getFolderDescription': function(test) {
     setUp.bind(this)();
     test.deepEqual(this.mainInstance.getFolderDescription('me/', 'etags-only'), {
       a: 'a',
@@ -91,7 +91,7 @@ exports['main'] = nodeunit.testCase({
     });
     test.done();
   },
-  'exists': function (test) {
+  'exists': function(test) {
     setUp.bind(this)();
     test.equal(this.mainInstance.exists('me/'), true);
     test.equal(this.mainInstance.exists('me/a'), true);
@@ -102,31 +102,31 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.mainInstance.exists('me/non/existing/'), false);
     test.done();
   },
-  'getContent': function (test) {
+  'getContent': function(test) {
     setUp.bind(this)();
     test.equal(this.mainInstance.getContent('me/a'), this.dataStore._data['content:me/a']);
     test.equal(this.mainInstance.getContent('me/non-existing'), undefined);
     test.done();
   },
-  'getContentType': function (test) {
+  'getContentType': function(test) {
     setUp.bind(this)();
     test.equal(this.mainInstance.getContentType('me/a'), this.dataStore._data['contentType:me/a']);
     test.equal(this.mainInstance.getContentType('me/non-existing'), undefined);
     test.done();
   },
-  'getContentLength': function (test) {
+  'getContentLength': function(test) {
     setUp.bind(this)();
     test.equal(this.mainInstance.getContentLength('me/a'), 4);
     test.equal(this.mainInstance.getContentLength('me/non-existing'), undefined);
     test.done();
   },
-  'getRevision': function (test) {
+  'getRevision': function(test) {
     setUp.bind(this)();
     test.equal(this.mainInstance.getRevision('me/a'), this.dataStore._data['revision:me/a']);
     test.equal(this.mainInstance.getRevision('me/non-existing'), undefined);
     test.done();
   },
-  'set': function (test) {
+  'set': function(test) {
     setUp.bind(this)();
     this.mainInstance.set('me/a', new Buffer('hi', 'utf-8'), new Buffer('hi', 'utf-8'), new Buffer('123', 'utf-8'));
     this.mainInstance.set('me/c', new Buffer('ho', 'utf-8'), new Buffer('ho', 'utf-8'), new Buffer('456', 'utf-8'));

@@ -15,13 +15,13 @@ exports['scopes'] = nodeunit.testCase({
   },
   tearDown: function() {
   },*/
-  'makeScopePaths for modules': function (test) {
+  'makeScopePaths for modules': function(test) {
     setUp.bind(this)();
     test.expect(1);
     test.deepEqual(this.scopesInstance.makeScopePaths('me', ['foo:r', 'bar:rw']).sort(), ['me/foo/:r', 'me/public/foo/:r', 'me/bar/:rw', 'me/public/bar/:rw'].sort());
     test.done();
   },
-  'makeScopePaths for root': function (test) {
+  'makeScopePaths for root': function(test) {
     setUp.bind(this)();
     test.expect(2);
     test.deepEqual(this.scopesInstance.makeScopePaths('me', [':r']), ['me/:r']);

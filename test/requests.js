@@ -12,7 +12,8 @@ function setUp() {
     },
     mayWrite: function(authHeader, path) {
       this._mayWriteCalled++;
-      return (authHeader === 'asdfqwer-write' && path === 'qwer/asdf/write');
+      return ((authHeader === 'asdfqwer-write' && path === 'qwer/asdf/write')
+          || (authHeader === 'Bearer SECRET' && path === 'me/existing'));
     }
   };
   this.mainMock = {
@@ -21,10 +22,13 @@ function setUp() {
     _getRevisionCalled: 0,
     _getContentCalled: 0,
     _getContentTypeCalled: 0,
+    _setCalled: 0,
+    _data: {},
     condMet: function(cond, path) {
       this._condMetCalled++;
       return (cond.ifNoneMatch === '*' && path === 'qwer/asdf/cond')
-          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/existing');
+          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/existing')
+          || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0] === '123' && path === 'me/existing');
     },
     exists: function(path) {
       this._existsCalled++;
@@ -41,6 +45,10 @@ function setUp() {
     getRevision: function(path) {
       this._getRevisionCalled++;
       return 'koe';
+    },
+    set: function(path, buf, contentType, revision) {
+      this._setCalled++;
+      this._data[path] = [buf, contentType, revision];
     }
   };
   this.res = {
@@ -76,12 +84,12 @@ function setUp() {
   this.requestsInstance = requests.createInstance('/path/to/storage/', this.scopesMock, this.mainMock);
 }
 
-exports['main'] = nodeunit.testCase({
+exports['requests'] = nodeunit.testCase({
   /*setUp: function() {
   },
   tearDown: function() {
   },*/
-  'writeHead': function (test) {
+  'writeHead': function(test) {
     setUp.bind(this)();
     this.requestsInstance.writeHead(this.res, 207, 'https://foo.bar', '123', 'application/json', 456);
     test.equal(this.res._status, 207);
@@ -99,7 +107,7 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, false);
     test.done();
   },
-  'writeRaw': function (test) {
+  'writeRaw': function(test) {
     setUp.bind(this)();
     this.requestsInstance.writeRaw(this.res, 'application/json', new Buffer('asdf', 'utf-8'), 'https://foo.bar', '123');
     test.equal(this.res._status, 200);
@@ -116,7 +124,7 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._body, 'asdf');
     test.done();
   },
-  'respond': function (test) {
+  'respond': function(test) {
     setUp.bind(this)();
     this.requestsInstance.respond(this.res, 'https://foo.bar', 408, '123');
     test.equal(this.res._status, 408);
@@ -134,7 +142,7 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, true);
     test.done();
   },
-  'checkNoFolder': function (test) {
+  'checkNoFolder': function(test) {
     setUp.bind(this)();
     this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo');
     test.equal(this.res._headers, undefined);
@@ -154,7 +162,7 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, true);
     test.done();
   },
-  'checkMayRead': function (test) {
+  'checkMayRead': function(test) {
     setUp.bind(this)();
     this.req.headers.authorization = 'asdfqwer-read';
     test.equal(this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read'), true);
@@ -179,7 +187,7 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, true);
     test.done();
   },
-  'checkMayWrite': function (test) {
+  'checkMayWrite': function(test) {
     setUp.bind(this)();
     this.req.headers.authorization = 'asdfqwer-write';
     test.equal(this.requestsInstance.checkMayWrite(this.req, this.res, 'qwer/asdf/write'), true);
@@ -204,7 +212,22 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, true);
     test.done();
   },
-  'checkCondMet': function (test) {
+  'stripQuotes': function(test) {
+    setUp.bind(this)();
+    test.deepEqual(this.requestsInstance.stripQuotes(''), ['']);
+    test.deepEqual(this.requestsInstance.stripQuotes('""'), ['']);
+    test.deepEqual(this.requestsInstance.stripQuotes('"a"'), ['a']);
+    test.deepEqual(this.requestsInstance.stripQuotes('"a","b"'), ['a', 'b']);
+    test.deepEqual(this.requestsInstance.stripQuotes('a,b'), ['a', 'b']);
+    test.deepEqual(this.requestsInstance.stripQuotes('"asdf","qw er"'), ['asdf', 'qw er']);
+    test.deepEqual(this.requestsInstance.stripQuotes('as df,qwer'), ['as df', 'qwer']);
+    test.deepEqual(this.requestsInstance.stripQuotes('"asdf", "qw er"'), ['asdf', 'qw er']);
+    test.deepEqual(this.requestsInstance.stripQuotes('as df , qwer'), ['as df', 'qwer']);
+    test.deepEqual(this.requestsInstance.stripQuotes(' "asdf"  ,    "qw er"   '), ['asdf', 'qw er']);
+    test.deepEqual(this.requestsInstance.stripQuotes('   as df    ,qwer    '), ['as df', 'qwer']);
+    test.done();
+  },
+  'checkCondMet': function(test) {
     setUp.bind(this)();
     this.req.headers['if-none-match'] = '*';
     test.equal(this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond'), true);
@@ -232,7 +255,7 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, true);
     test.done();
   },
-  'checkFound': function (test) {
+  'checkFound': function(test) {
     setUp.bind(this)();
     this.req.headers = {
       origin: 'http://local.host'
@@ -258,7 +281,7 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, true);
     test.done();
   },
-  'illegal verb': function (test) {
+  'illegal verb': function(test) {
     setUp.bind(this)();
     test.expect(6);
     this.res.onEnd(function() {
@@ -288,7 +311,7 @@ exports['main'] = nodeunit.testCase({
     };
     this.requestsInstance.handleRequest(this.req, this.res);
   },
-  'OPTIONS verb': function (test) {
+  'OPTIONS verb': function(test) {
     setUp.bind(this)();
     test.expect(6);
     this.res.onEnd(function() {
@@ -316,7 +339,7 @@ exports['main'] = nodeunit.testCase({
     };
     this.requestsInstance.handleRequest(this.req, this.res);
   },
-  'HEAD verb': function (test) {
+  'HEAD verb': function(test) {
     setUp.bind(this)();
     test.expect(6);
     this.res.onEnd(function() {
@@ -347,7 +370,7 @@ exports['main'] = nodeunit.testCase({
     };
     this.requestsInstance.handleRequest(this.req, this.res);
   },
-  'GET verb': function (test) {
+  'GET verb': function(test) {
     setUp.bind(this)();
     test.expect(7);
     this.res.onEnd(function() {
@@ -378,6 +401,49 @@ exports['main'] = nodeunit.testCase({
       }
     };
     this.requestsInstance.handleRequest(this.req, this.res);
+  },
+  'PUT verb': function(test) {
+    setUp.bind(this)();
+    test.expect(10);
+    this.res.onEnd(function() {
+      test.equal(this.scopesMock._mayReadCalled, 0);
+      test.equal(this.scopesMock._mayWriteCalled, 1);
+      test.equal(this.mainMock._setCalled, 1);
+      test.equal(this.mainMock._data['me/existing'][0], 'i put you');
+      test.equal(this.mainMock._data['me/existing'][1], undefined);
+      test.equal(typeof(this.mainMock._data['me/existing'][2]), 'string');
+      test.equal(this.res._status, 200);
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Expires': '0',
+        'etag': '"' + this.mainMock._data['me/existing'][2] + '"'
+      });
+      test.equal(this.res._body, '');
+      test.equal(this.res._ended, true);
+      test.done();
+    }.bind(this));
+    this.req = {
+      method: 'PUT',
+      url: '/path/to/storage/me/existing',
+      headers: {
+        origin: 'http://local.host',
+        authorization: 'Bearer SECRET',
+        'if-none-match': '"123", "456"'
+      },
+      on: function(event, cb) {
+        if (event === 'data') {
+          this._dataCb = cb;
+        } else if (event === 'end') {
+          this._endCb = cb;
+        }
+      }
+    };
+    this.requestsInstance.handleRequest(this.req, this.res);
+    this.req._dataCb(new Buffer('i put you', 'utf-8'));
+    this.req._endCb();
   }
 });
 /*
