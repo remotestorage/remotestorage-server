@@ -48,6 +48,12 @@ function setUp() {
         this._body += buf.toString();
       }
       this._ended = true;
+      if (this._cb) {
+        this._cb();
+      }
+    },
+    onEnd: function(cb) {
+      this._cb = cb;
     }
   };
   this.req = {
@@ -239,10 +245,31 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._body, '404 Not Found');
     test.equal(this.res._ended, true);
     test.done();
+  },
+  'HEAD verb': function (test) {
+    setUp.bind(this)();
+    test.expect(5);
+    this.res.onEnd(function() {
+      test.equal(this.mainMock._existsCalled, 2);
+      test.equal(this.res._status, 200);
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Expires': '0',
+        'content-type': 'text/plain',
+        'content-length': '13'});
+      test.equal(this.res._body, '');
+      test.equal(this.res._ended, true);
+    });
+    this.req.headers = {
+      origin: 'http://local.host'
+    };
+    this.requestsInstance.handleRequest(this.req, this.res, '/me/existing');
   }
 });
 /*
-  function checkFound(req, res, path) {
   function doHead(req, res, path) {
   function doGet(req, res, path, folderFormat, folderContentType) {
   function doPut(req, res, path) {
