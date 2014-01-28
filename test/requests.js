@@ -230,7 +230,7 @@ exports['requests'] = nodeunit.testCase({
   'checkCondMet': function(test) {
     setUp.bind(this)();
     this.req.headers['if-none-match'] = '*';
-    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond'), true);
+    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond', 412), true);
     test.equal(this.mainMock._condMetCalled, 1);
     test.equal(this.res._status, undefined);
     test.equal(this.res._headers, undefined);
@@ -239,9 +239,9 @@ exports['requests'] = nodeunit.testCase({
     this.req.headers = {};
     this.req.headers.authorization = 'asdfqwer-wrong';
     this.req.headers['if-match'] = 'aap';
-    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond'), undefined);
+    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond', 409), undefined);
     test.equal(this.mainMock._condMetCalled, 2);
-    test.equal(this.res._status, 412);
+    test.equal(this.res._status, 409);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
@@ -250,8 +250,8 @@ exports['requests'] = nodeunit.testCase({
       'Expires': '0',
       'etag': '"koe"',
       'content-type': 'text/plain',
-      'content-length': '23'});
-    test.equal(this.res._body, '412 Precondition failed');
+      'content-length': '20'});
+    test.equal(this.res._body, '409 Computer says no');
     test.equal(this.res._ended, true);
     test.done();
   },
