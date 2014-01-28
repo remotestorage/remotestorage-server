@@ -7,24 +7,36 @@ function setUp() {
     _mayWriteCalled: 0,
     mayRead: function(authHeader, path) {
       this._mayReadCalled++;
-      return (authHeader === 'asdfqwer-read' && path === '/qwer/asdf/read');
+      return ((authHeader === 'asdfqwer-read' && path === 'qwer/asdf/read')
+          || (authHeader === 'Bearer SECRET' && path === 'me/existing'));
     },
     mayWrite: function(authHeader, path) {
       this._mayWriteCalled++;
-      return (authHeader === 'asdfqwer-write' && path === '/qwer/asdf/write');
+      return (authHeader === 'asdfqwer-write' && path === 'qwer/asdf/write');
     }
   };
   this.mainMock = {
     _condMetCalled: 0,
     _existsCalled: 0,
     _getRevisionCalled: 0,
+    _getContentCalled: 0,
+    _getContentTypeCalled: 0,
     condMet: function(cond, path) {
       this._condMetCalled++;
-      return (cond.ifNoneMatch === '*' && path === '/qwer/asdf/cond');
+      return (cond.ifNoneMatch === '*' && path === 'qwer/asdf/cond')
+          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/existing');
     },
     exists: function(path) {
       this._existsCalled++;
-      return (path === '/me/existing');
+      return (path === 'me/existing');
+    },
+    getContent: function(path) {
+      this._getContentCalled++;
+      return 'yes, very content!';
+    },
+    getContentType: function(path) {
+      this._getContentTypeCalled++;
+      return 'very!';
     },
     getRevision: function(path) {
       this._getRevisionCalled++;
@@ -61,7 +73,7 @@ function setUp() {
       origin: 'http://local.host'
     }
   };
-  this.requestsInstance = requests.createInstance(this.scopesMock, this.mainMock);
+  this.requestsInstance = requests.createInstance('/path/to/storage/', this.scopesMock, this.mainMock);
 }
 
 exports['main'] = nodeunit.testCase({
@@ -124,11 +136,11 @@ exports['main'] = nodeunit.testCase({
   },
   'checkNoFolder': function (test) {
     setUp.bind(this)();
-    this.requestsInstance.checkNoFolder(this.req, this.res, '/me/foo');
+    this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo');
     test.equal(this.res._headers, undefined);
     test.equal(this.res._body, '');
     test.equal(this.res._ended, false);
-    test.equal(this.requestsInstance.checkNoFolder(this.req, this.res, '/me/foo/'), undefined);
+    test.equal(this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo/'), undefined);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'http://local.host',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
@@ -145,14 +157,14 @@ exports['main'] = nodeunit.testCase({
   'checkMayRead': function (test) {
     setUp.bind(this)();
     this.req.headers.authorization = 'asdfqwer-read';
-    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, '/qwer/asdf/read'), true);
+    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read'), true);
     test.equal(this.scopesMock._mayReadCalled, 1);
     test.equal(this.res._status, undefined);
     test.equal(this.res._headers, undefined);
     test.equal(this.res._body, '');
     test.equal(this.res._ended, false);
     this.req.headers.authorization = 'asdfqwer-wrong';
-    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, '/qwer/asdf/read'), undefined);
+    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read'), undefined);
     test.equal(this.scopesMock._mayReadCalled, 2);
     test.equal(this.res._status, 401);
     test.deepEqual(this.res._headers, {
@@ -170,14 +182,14 @@ exports['main'] = nodeunit.testCase({
   'checkMayWrite': function (test) {
     setUp.bind(this)();
     this.req.headers.authorization = 'asdfqwer-write';
-    test.equal(this.requestsInstance.checkMayWrite(this.req, this.res, '/qwer/asdf/write'), true);
+    test.equal(this.requestsInstance.checkMayWrite(this.req, this.res, 'qwer/asdf/write'), true);
     test.equal(this.scopesMock._mayWriteCalled, 1);
     test.equal(this.res._status, undefined);
     test.equal(this.res._headers, undefined);
     test.equal(this.res._body, '');
     test.equal(this.res._ended, false);
     this.req.headers.authorization = 'asdfqwer-wrong';
-    test.equal(this.requestsInstance.checkMayWrite(this.req, this.res, '/qwer/asdf/write'), undefined);
+    test.equal(this.requestsInstance.checkMayWrite(this.req, this.res, 'qwer/asdf/write'), undefined);
     test.equal(this.scopesMock._mayWriteCalled, 2);
     test.equal(this.res._status, 401);
     test.deepEqual(this.res._headers, {
@@ -195,7 +207,7 @@ exports['main'] = nodeunit.testCase({
   'checkCondMet': function (test) {
     setUp.bind(this)();
     this.req.headers['if-none-match'] = '*';
-    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, '/qwer/asdf/cond'), true);
+    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond'), true);
     test.equal(this.mainMock._condMetCalled, 1);
     test.equal(this.res._status, undefined);
     test.equal(this.res._headers, undefined);
@@ -204,7 +216,7 @@ exports['main'] = nodeunit.testCase({
     this.req.headers = {};
     this.req.headers.authorization = 'asdfqwer-wrong';
     this.req.headers['if-match'] = 'aap';
-    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, '/qwer/asdf/cond'), undefined);
+    test.equal(this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond'), undefined);
     test.equal(this.mainMock._condMetCalled, 2);
     test.equal(this.res._status, 412);
     test.deepEqual(this.res._headers, {
@@ -225,13 +237,13 @@ exports['main'] = nodeunit.testCase({
     this.req.headers = {
       origin: 'http://local.host'
     };
-    test.equal(this.requestsInstance.checkFound(this.req, this.res, '/me/existing'), true);
+    test.equal(this.requestsInstance.checkFound(this.req, this.res, 'me/existing'), true);
     test.equal(this.mainMock._existsCalled, 1);
     test.equal(this.res._status, undefined);
     test.equal(this.res._headers, undefined);
     test.equal(this.res._body, '');
     test.equal(this.res._ended, false);
-    test.equal(this.requestsInstance.checkFound(this.req, this.res, '/me/non-existing'), undefined);
+    test.equal(this.requestsInstance.checkFound(this.req, this.res, 'me/non-existing'), undefined);
     test.equal(this.mainMock._existsCalled, 2);
     test.equal(this.res._status, 404);
     test.deepEqual(this.res._headers, {
@@ -248,9 +260,10 @@ exports['main'] = nodeunit.testCase({
   },
   'HEAD verb': function (test) {
     setUp.bind(this)();
-    test.expect(5);
+    test.expect(6);
     this.res.onEnd(function() {
-      test.equal(this.mainMock._existsCalled, 2);
+      test.equal(this.scopesMock._mayReadCalled, 1);
+      test.equal(this.scopesMock._mayWriteCalled, 0);
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
@@ -258,15 +271,22 @@ exports['main'] = nodeunit.testCase({
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
         'Expires': '0',
-        'content-type': 'text/plain',
-        'content-length': '13'});
+        'etag': '"koe"',
+        'content-type': 'very!'
+      });
       test.equal(this.res._body, '');
       test.equal(this.res._ended, true);
-    });
-    this.req.headers = {
-      origin: 'http://local.host'
+      test.done();
+    }.bind(this));
+    this.req = {
+      method: 'HEAD',
+      url: '/path/to/storage/me/existing',
+      headers: {
+        origin: 'http://local.host',
+        authorization: 'Bearer SECRET'
+      }
     };
-    this.requestsInstance.handleRequest(this.req, this.res, '/me/existing');
+    this.requestsInstance.handleRequest(this.req, this.res);
   }
 });
 /*
