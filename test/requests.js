@@ -16,11 +16,18 @@ function setUp() {
   };
   this.mainMock = {
     _condMetCalled: 0,
+    _existsCalled: 0,
+    _getRevisionCalled: 0,
     condMet: function(cond, path) {
       this._condMetCalled++;
       return (cond.ifNoneMatch === '*' && path === '/qwer/asdf/cond');
     },
+    exists: function(path) {
+      this._existsCalled++;
+      return (path === '/me/existing');
+    },
     getRevision: function(path) {
+      this._getRevisionCalled++;
       return 'koe';
     }
   };
@@ -206,10 +213,35 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._body, '412 Precondition failed');
     test.equal(this.res._ended, true);
     test.done();
+  },
+  'checkFound': function (test) {
+    setUp.bind(this)();
+    this.req.headers = {
+      origin: 'http://local.host'
+    };
+    test.equal(this.requestsInstance.checkFound(this.req, this.res, '/me/existing'), true);
+    test.equal(this.mainMock._existsCalled, 1);
+    test.equal(this.res._status, undefined);
+    test.equal(this.res._headers, undefined);
+    test.equal(this.res._body, '');
+    test.equal(this.res._ended, false);
+    test.equal(this.requestsInstance.checkFound(this.req, this.res, '/me/non-existing'), undefined);
+    test.equal(this.mainMock._existsCalled, 2);
+    test.equal(this.res._status, 404);
+    test.deepEqual(this.res._headers, {
+      'Access-Control-Allow-Origin': 'http://local.host',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+      'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+      'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+      'Expires': '0',
+      'content-type': 'text/plain',
+      'content-length': '13'});
+    test.equal(this.res._body, '404 Not Found');
+    test.equal(this.res._ended, true);
+    test.done();
   }
 });
 /*
-  function checkCondMet(req, res, path) {
   function checkFound(req, res, path) {
   function doHead(req, res, path) {
   function doGet(req, res, path, folderFormat, folderContentType) {
