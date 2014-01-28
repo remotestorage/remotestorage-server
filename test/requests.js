@@ -444,14 +444,38 @@ exports['requests'] = nodeunit.testCase({
     this.requestsInstance.handleRequest(this.req, this.res);
     this.req._dataCb(new Buffer('i put you', 'utf-8'));
     this.req._endCb();
+  },
+  'DELETE verb': function(test) {
+    setUp.bind(this)();
+    test.expect(10);
+    this.res.onEnd(function() {
+      test.equal(this.scopesMock._mayReadCalled, 0);
+      test.equal(this.scopesMock._mayWriteCalled, 1);
+      test.equal(this.mainMock._setCalled, 1);
+      test.equal(this.mainMock._data['me/existing'][0], undefined);
+      test.equal(this.mainMock._data['me/existing'][1], undefined);
+      test.equal(this.mainMock._data['me/existing'][2], undefined);
+      test.equal(this.res._status, 200);
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Expires': '0'
+      });
+      test.equal(this.res._body, '');
+      test.equal(this.res._ended, true);
+      test.done();
+    }.bind(this));
+    this.req = {
+      method: 'DELETE',
+      url: '/path/to/storage/me/existing',
+      headers: {
+        origin: 'http://local.host',
+        authorization: 'Bearer SECRET',
+        'if-none-match': '"123", "456"'
+      }
+    };
+    this.requestsInstance.handleRequest(this.req, this.res);
   }
 });
-/*
-  function doHead(req, res, path) {
-  function doGet(req, res, path, folderFormat, folderContentType) {
-  function doPut(req, res, path) {
-    req.on('data', function(chunk) {
-    req.on('end', function() {
-  function doDelete(req, res, path) {
-  function handleRequest(req, res) {
-*/
