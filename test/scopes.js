@@ -24,8 +24,8 @@ exports['scopes'] = nodeunit.testCase({
   'makeScopePaths for root': function(test) {
     setUp.bind(this)();
     test.expect(2);
-    test.deepEqual(this.scopesInstance.makeScopePaths('me', [':r']), ['me/:r']);
-    test.deepEqual(this.scopesInstance.makeScopePaths('me', [':rw']), ['me/:rw']);
+    test.deepEqual(this.scopesInstance.makeScopePaths('me', ['*:r'], '*'), ['me/:r']);
+    test.deepEqual(this.scopesInstance.makeScopePaths('me', ['root:rw'], 'root'), ['me/:rw']);
     test.done();
   },
   'mayRead for foo:r': function(test) {
@@ -259,7 +259,7 @@ exports['scopes'] = nodeunit.testCase({
   'mayRead for :r': function(test) {
     setUp.bind(this)();
     test.expect(34);
-    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', [':r'])};
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['root:r'], 'root')};
     //foo:
     test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/'), true);
     test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/'), false);
@@ -303,7 +303,7 @@ exports['scopes'] = nodeunit.testCase({
   'mayRead for :rw': function(test) {
     setUp.bind(this)();
     test.expect(34);
-    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', [':rw'])};
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['root:rw'], 'root')};
     //foo:
     test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/'), true);
     test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/'), false);
@@ -347,7 +347,7 @@ exports['scopes'] = nodeunit.testCase({
   'mayWrite for :r': function(test) {
     setUp.bind(this)();
     test.expect(34);
-    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', [':r'])};
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['*:r'], '*')};
     //foo:
     test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/'), false);
     test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/'), false);
@@ -391,7 +391,7 @@ exports['scopes'] = nodeunit.testCase({
   'mayWrite for :rw': function(test) {
     setUp.bind(this)();
     test.expect(34);
-    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', [':rw'])};
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['*:rw'], '*')};
     //foo:
     test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/'), false);
     test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/'), false);
