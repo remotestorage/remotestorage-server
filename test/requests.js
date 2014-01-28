@@ -258,6 +258,64 @@ exports['main'] = nodeunit.testCase({
     test.equal(this.res._ended, true);
     test.done();
   },
+  'illegal verb': function (test) {
+    setUp.bind(this)();
+    test.expect(6);
+    this.res.onEnd(function() {
+      test.equal(this.scopesMock._mayReadCalled, 0);
+      test.equal(this.scopesMock._mayWriteCalled, 0);
+      test.equal(this.res._status, 405);
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Expires': '0',
+        'content-type': 'text/plain',
+        'content-length': '22'
+      });
+      test.equal(this.res._body, '405 Method not allowed');
+      test.equal(this.res._ended, true);
+      test.done();
+    }.bind(this));
+    this.req = {
+      method: 'PATCH',
+      url: '/path/to/storage/me/existing',
+      headers: {
+        origin: 'http://local.host',
+        authorization: 'Bearer SECRET'
+      }
+    };
+    this.requestsInstance.handleRequest(this.req, this.res);
+  },
+  'OPTIONS verb': function (test) {
+    setUp.bind(this)();
+    test.expect(6);
+    this.res.onEnd(function() {
+      test.equal(this.scopesMock._mayReadCalled, 0);
+      test.equal(this.scopesMock._mayWriteCalled, 0);
+      test.equal(this.res._status, 200);
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Expires': '0'
+      });
+      test.equal(this.res._body, '');
+      test.equal(this.res._ended, true);
+      test.done();
+    }.bind(this));
+    this.req = {
+      method: 'OPTIONS',
+      url: '/path/to/storage/me/existing',
+      headers: {
+        origin: 'http://local.host',
+        authorization: 'Bearer SECRET'
+      }
+    };
+    this.requestsInstance.handleRequest(this.req, this.res);
+  },
   'HEAD verb': function (test) {
     setUp.bind(this)();
     test.expect(6);
