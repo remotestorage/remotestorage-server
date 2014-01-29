@@ -2,6 +2,10 @@
 
 The remoteStorage core from https://github.com/remotestorage/starter-kit
 
+[![Build Status](https://secure.travis-ci.org/remotestorage/remotestorage.js.png)](http://travis-ci.org/remotestorage/remotestorage.js)
+[![devDependency Status](https://david-dm.org/remotestorage/remotestorage.js/dev-status.png)](https://david-dm.org/remotestorage/remotestorage.js#info=devDependencies)
+[![Code Climate](https://codeclimate.com/github/remotestorage/remotestorage.js.png)](https://codeclimate.com/github/remotestorage/remotestorage.js)
+
 # interface
 
 ````js
