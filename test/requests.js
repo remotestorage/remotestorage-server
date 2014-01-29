@@ -8,12 +8,14 @@ function setUp() {
     mayRead: function(authHeader, path) {
       this._mayReadCalled++;
       return ((authHeader === 'asdfqwer-read' && path === 'qwer/asdf/read')
-          || (authHeader === 'Bearer SECRET' && path === 'me/existing'));
+          || (authHeader === 'Bearer SECRET' && path === 'me/existing')
+          || (authHeader === 'Bearer SECRET' && path === 'me/folder/'));
     },
     mayWrite: function(authHeader, path) {
       this._mayWriteCalled++;
       return ((authHeader === 'asdfqwer-write' && path === 'qwer/asdf/write')
-          || (authHeader === 'Bearer SECRET' && path === 'me/existing'));
+          || (authHeader === 'Bearer SECRET' && path === 'me/existing')
+          || (authHeader === 'Bearer SECRET' && path === 'me/folder/'));
     }
   };
   this.mainMock = {
@@ -21,6 +23,7 @@ function setUp() {
     _existsCalled: 0,
     _getRevisionCalled: 0,
     _getContentCalled: 0,
+    _getFolderDescriptionCalled: 0,
     _getContentTypeCalled: 0,
     _setCalled: 0,
     _data: {},
@@ -28,15 +31,20 @@ function setUp() {
       this._condMetCalled++;
       return (cond.ifNoneMatch === '*' && path === 'qwer/asdf/cond')
           || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/existing')
+          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/folder/')
           || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0] === '123' && path === 'me/existing');
     },
     exists: function(path) {
       this._existsCalled++;
-      return (path === 'me/existing');
+      return (path === 'me/existing' || path === 'me/folder/');
     },
     getContent: function(path) {
       this._getContentCalled++;
       return new Buffer('yes, very content!', 'utf-8');
+    },
+    getFolderDescription: function(path) {
+      this._getFolderDescriptionCalled++;
+      return {a: 'b'};
     },
     getContentType: function(path) {
       this._getContentTypeCalled++;
@@ -339,7 +347,7 @@ exports['requests'] = nodeunit.testCase({
     };
     this.requestsInstance.handleRequest(this.req, this.res);
   },
-  'HEAD verb': function(test) {
+  'HEAD verb document': function(test) {
     setUp.bind(this)();
     test.expect(6);
     this.res.onEnd(function() {
@@ -368,9 +376,39 @@ exports['requests'] = nodeunit.testCase({
         authorization: 'Bearer SECRET'
       }
     };
-    this.requestsInstance.handleRequest(this.req, this.res);
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
   },
-  'GET verb': function(test) {
+  'HEAD verb folder': function(test) {
+    setUp.bind(this)();
+    test.expect(6);
+    this.res.onEnd(function() {
+      test.equal(this.scopesMock._mayReadCalled, 1);
+      test.equal(this.scopesMock._mayWriteCalled, 0);
+      test.equal(this.res._status, 200);
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Expires': '0',
+        'etag': '"koe"',
+        'content-type': 'asdf'
+      });
+      test.equal(this.res._body, '');
+      test.equal(this.res._ended, true);
+      test.done();
+    }.bind(this));
+    this.req = {
+      method: 'HEAD',
+      url: '/path/to/storage/me/folder/',
+      headers: {
+        origin: 'http://local.host',
+        authorization: 'Bearer SECRET'
+      }
+    };
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
+  },
+  'GET verb document': function(test) {
     setUp.bind(this)();
     test.expect(7);
     this.res.onEnd(function() {
@@ -400,7 +438,39 @@ exports['requests'] = nodeunit.testCase({
         authorization: 'Bearer SECRET'
       }
     };
-    this.requestsInstance.handleRequest(this.req, this.res);
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
+  },
+  'GET verb folder': function(test) {
+    setUp.bind(this)();
+    test.expect(7);
+    this.res.onEnd(function() {
+      test.equal(this.scopesMock._mayReadCalled, 1);
+      test.equal(this.scopesMock._mayWriteCalled, 0);
+      test.equal(this.mainMock._getFolderDescriptionCalled, 1);
+      test.equal(this.res._status, 200);
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Expires': '0',
+        'etag': '"koe"',
+        'content-length': '9',
+        'content-type': 'asdf'
+      });
+      test.equal(this.res._body, JSON.stringify({a: 'b'}));
+      test.equal(this.res._ended, true);
+      test.done();
+    }.bind(this));
+    this.req = {
+      method: 'GET',
+      url: '/path/to/storage/me/folder/',
+      headers: {
+        origin: 'http://local.host',
+        authorization: 'Bearer SECRET'
+      }
+    };
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
   },
   'PUT verb': function(test) {
     setUp.bind(this)();
