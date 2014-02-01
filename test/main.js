@@ -1,11 +1,12 @@
-var main = require('../lib/main'),
+var Q = require('q'),
+  main = require('../lib/main'),
   nodeunit = require('nodeunit');
   
 function setUp() {
   this.dataStore = {
     _data: {},
-    get: function(key) { return this._data[key]; },
-    set: function(key, value) { this._data[key] = value; }
+    get: function(key, cb) { cb(null, this._data[key]); },
+    set: function(key, value, cb) { this._data[key] = value; cb(null); }
   };
   this.mainInstance = main.createInstance(this.dataStore);
   this.dataStore._data = {
@@ -30,112 +31,203 @@ exports['main'] = nodeunit.testCase({
   },*/
   'condMet': function(test) {
     setUp.bind(this)();
-    test.equal(this.mainInstance.condMet({ifNoneMatch: '*'}, 'me/existing'), false);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: '*'}, 'me/non-existing'), true);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: ['ho']}, 'me/existing'), true);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: ['he', 'ho']}, 'me/existing'), true);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: ['hi']}, 'me/existing'), false);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: ['he', 'hi']}, 'me/existing'), false);
-    test.equal(this.mainInstance.condMet({ifNoneMatch: ['ho']}, 'me/non-existing'), true);
-    test.equal(this.mainInstance.condMet({ifMatch: ['hi']}, 'me/existing'), true);
-    test.equal(this.mainInstance.condMet({ifMatch: ['ho']}, 'me/existing'), false);
-    test.equal(this.mainInstance.condMet({ifMatch: ['hi']}, 'me/non-existing'), false);
-    test.equal(this.mainInstance.condMet({ ifNoneMatch: undefined, ifMatch: undefined }, 'me/existing'), true);
-    test.done();
+    this.mainInstance.condMet({ ifNoneMatch: undefined, ifMatch: undefined }, 'me/existing', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, true);
+      this.mainInstance.condMet({ifNoneMatch: '*'}, 'me/existing', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, false);
+        this.mainInstance.condMet({ifNoneMatch: '*'}, 'me/non-existing', function(err, answer) {
+          test.equal(err, null);
+          test.equal(answer, true);
+          this.mainInstance.condMet({ifNoneMatch: ['ho']}, 'me/existing', function(err, answer) {
+            test.equal(err, null);
+            test.equal(answer, true);
+            this.mainInstance.condMet({ifNoneMatch: ['he', 'ho']}, 'me/existing', function(err, answer) {
+              test.equal(err, null);
+              test.equal(answer, true);
+              this.mainInstance.condMet({ifNoneMatch: ['hi']}, 'me/existing', function(err, answer) {
+                test.equal(err, null);
+                test.equal(answer, false);
+                this.mainInstance.condMet({ifNoneMatch: ['he', 'hi']}, 'me/existing', function(err, answer) {
+                  test.equal(err, null);
+                  test.equal(answer, false);
+                  this.mainInstance.condMet({ifNoneMatch: ['ho']}, 'me/non-existing', function(err, answer) {
+                    test.equal(err, null);
+                    test.equal(answer, true);
+                    this.mainInstance.condMet({ifMatch: ['hi']}, 'me/existing', function(err, answer) {
+                      test.equal(err, null);
+                      test.equal(answer, true);
+                      this.mainInstance.condMet({ifMatch: ['ho']}, 'me/existing', function(err, answer) {
+                        test.equal(err, null);
+                        test.equal(answer, false);
+                        this.mainInstance.condMet({ifMatch: ['hi']}, 'me/non-existing', function(err, answer) {
+                          test.equal(err, null);
+                          test.equal(answer, false);
+                          test.done();
+                        }.bind(this));
+                      }.bind(this));
+                    }.bind(this));
+                  }.bind(this));
+                }.bind(this));
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
   },
   'revisionsToMap': function(test) {
     setUp.bind(this)();
-    test.deepEqual(this.mainInstance.revisionsToMap({ a: 'a', b: 'b'}, 'me/'), {
-      '@context': 'http://remotestorage.io/spec/folder-description',
-      items: {
-        a: {
-          ETag: 'a',
-          'Content-Type': 'a-ish',
-          'Content-Length': 4
-        },
-        b: {
-          ETag: 'b',
-          'Content-Type': 'b-ish',
-          'Content-Length': 8
+    this.mainInstance.revisionsToMap({ a: 'a', b: 'b'}, 'me/', function(err, answer) {
+      test.equal(err, null);
+      test.deepEqual(JSON.stringify(answer), JSON.stringify({
+        '@context': 'http://remotestorage.io/spec/folder-description',
+        items: {
+          a: {
+            ETag: 'a',
+            'Content-Type': 'a-ish',
+            'Content-Length': 4
+          },
+          b: {
+            ETag: 'b',
+            'Content-Type': 'b-ish',
+            'Content-Length': 8
+          }
         }
-      }
+      }));
     });
     test.done();
   },
   'getFolderDescription': function(test) {
     setUp.bind(this)();
-    test.deepEqual(this.mainInstance.getFolderDescription('me/', 'etags-only'), {
-      a: 'a',
-      b: 'b',
-      existing: 'hi'
-    });
-    test.deepEqual(this.mainInstance.getFolderDescription('me/', 'map'), {
-      '@context': 'http://remotestorage.io/spec/folder-description',
-      items: {
-        a: {
-          ETag: 'a',
-          'Content-Type': 'a-ish',
-          'Content-Length': 4
-        },
-        b: {
-          ETag: 'b',
-          'Content-Type': 'b-ish',
-          'Content-Length': 8
-        },
-        existing: {
-          ETag: 'hi',
-          'Content-Type': 'hi',
-          'Content-Length': 2
-        }
-      }
-    });
-    test.done();
+    this.mainInstance.getFolderDescription('me/', 'etags-only', function(err, obj) {
+      test.equal(err, null);
+      test.deepEqual(obj, {
+        a: 'a',
+        b: 'b',
+        existing: 'hi'
+      });
+      this.mainInstance.getFolderDescription('me/', 'map', function(err, obj) {
+        test.equal(err, null);
+        test.deepEqual(obj, {
+          '@context': 'http://remotestorage.io/spec/folder-description',
+          items: {
+            a: {
+              ETag: 'a',
+              'Content-Type': 'a-ish',
+              'Content-Length': 4
+            },
+            b: {
+              ETag: 'b',
+              'Content-Type': 'b-ish',
+              'Content-Length': 8
+            },
+            existing: {
+              ETag: 'hi',
+              'Content-Type': 'hi',
+              'Content-Length': 2
+            }
+          }
+        });
+      });
+      test.done();
+    }.bind(this));
   },
   'exists': function(test) {
     setUp.bind(this)();
-    test.equal(this.mainInstance.exists('me/'), true);
-    test.equal(this.mainInstance.exists('me/a'), true);
-    test.equal(this.mainInstance.exists('me/existing'), true);
-    test.equal(this.mainInstance.exists('me/non-existing'), false);
-    test.equal(this.mainInstance.exists('me/non/existing'), false);
-    test.equal(this.mainInstance.exists('me/non-existing/'), false);
-    test.equal(this.mainInstance.exists('me/non/existing/'), false);
-    test.done();
+    this.mainInstance.exists('me/', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, true);
+      this.mainInstance.exists('me/a', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, true);
+        this.mainInstance.exists('me/non-existing', function(err, answer) {
+          test.equal(err, null);
+          test.equal(answer, false);
+          this.mainInstance.exists('me/non/existing', function(err, answer) {
+            test.equal(err, null);
+            test.equal(answer, false);
+            this.mainInstance.exists('me/non-existing/', function(err, answer) {
+              test.equal(err, null);
+              test.equal(answer, false);
+              this.mainInstance.exists('me/non/existing/', function(err, answer) {
+                test.equal(err, null);
+                test.equal(answer, false);
+                this.mainInstance.exists('me/existing', function(err, answer) {
+                  test.equal(err, null);
+                  test.equal(answer, true);
+                  test.done();
+                }.bind(this));
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
   },
   'getContent': function(test) {
     setUp.bind(this)();
-    test.equal(this.mainInstance.getContent('me/a'), this.dataStore._data['content:me/a']);
-    test.equal(this.mainInstance.getContent('me/non-existing'), undefined);
-    test.done();
+    this.mainInstance.getContent('me/a', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, this.dataStore._data['content:me/a']);
+      this.mainInstance.getContent('me/non-existing', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, undefined);
+        test.done();
+      });
+    }.bind(this));
   },
   'getContentType': function(test) {
     setUp.bind(this)();
-    test.equal(this.mainInstance.getContentType('me/a'), this.dataStore._data['contentType:me/a']);
-    test.equal(this.mainInstance.getContentType('me/non-existing'), undefined);
-    test.done();
+    this.mainInstance.getContentType('me/a', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, this.dataStore._data['contentType:me/a']);
+      this.mainInstance.getContentType('me/non-existing', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, undefined);
+        test.done();
+      });
+    }.bind(this));
   },
   'getContentLength': function(test) {
     setUp.bind(this)();
-    test.equal(this.mainInstance.getContentLength('me/a'), 4);
-    test.equal(this.mainInstance.getContentLength('me/non-existing'), undefined);
-    test.done();
+    this.mainInstance.getContentLength('me/a', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, 4);
+      this.mainInstance.getContentLength('me/non-existing', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, undefined);
+        test.done();
+      });
+    }.bind(this));
   },
   'getRevision': function(test) {
     setUp.bind(this)();
-    test.equal(this.mainInstance.getRevision('me/a'), this.dataStore._data['revision:me/a']);
-    test.equal(this.mainInstance.getRevision('me/non-existing'), undefined);
-    test.done();
+    this.mainInstance.getRevision('me/a', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, this.dataStore._data['revision:me/a']);
+      this.mainInstance.getRevision('me/non-existing', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, undefined);
+        test.done();
+      });
+    }.bind(this));
   },
   'set': function(test) {
     setUp.bind(this)();
-    this.mainInstance.set('me/a', new Buffer('hi', 'utf-8'), new Buffer('hi', 'utf-8'), new Buffer('123', 'utf-8'));
-    this.mainInstance.set('me/c', new Buffer('ho', 'utf-8'), new Buffer('ho', 'utf-8'), new Buffer('456', 'utf-8'));
-    test.deepEqual(this.dataStore._data['content:me/a'], new Buffer('hi', 'utf-8'));
-    test.deepEqual(this.dataStore._data['contentType:me/a'], new Buffer('hi', 'utf-8'));
-    test.deepEqual(this.dataStore._data['revision:me/a'], new Buffer('123', 'utf-8'));
-    test.deepEqual(this.dataStore._data['content:me/c'], new Buffer('ho', 'utf-8'));
-    test.deepEqual(this.dataStore._data['contentType:me/c'], new Buffer('ho', 'utf-8'));
-    test.deepEqual(this.dataStore._data['revision:me/c'], new Buffer('456', 'utf-8'));
-    test.done();
+    this.mainInstance.set('me/a', new Buffer('hi', 'utf-8'), new Buffer('hi', 'utf-8'), new Buffer('123', 'utf-8'), function(err) {
+      test.equal(err, null);
+      this.mainInstance.set('me/c', new Buffer('ho', 'utf-8'), new Buffer('ho', 'utf-8'), new Buffer('456', 'utf-8'), function(err) {
+        test.equal(err, null);
+        test.deepEqual(this.dataStore._data['content:me/a'], new Buffer('hi', 'utf-8'));
+        test.deepEqual(this.dataStore._data['contentType:me/a'], new Buffer('hi', 'utf-8'));
+        test.deepEqual(this.dataStore._data['revision:me/a'], new Buffer('123', 'utf-8'));
+        test.deepEqual(this.dataStore._data['content:me/c'], new Buffer('ho', 'utf-8'));
+        test.deepEqual(this.dataStore._data['contentType:me/c'], new Buffer('ho', 'utf-8'));
+        test.deepEqual(this.dataStore._data['revision:me/c'], new Buffer('456', 'utf-8'));
+        test.done();
+      }.bind(this));
+    }.bind(this));
   }
 });
