@@ -1,4 +1,4 @@
-var main = require('../lib/main'),
+var Main = require('../lib/main'),
   nodeunit = require('nodeunit');
   
 function setUp() {
@@ -7,7 +7,7 @@ function setUp() {
     get: function(key, cb) { cb(null, this._data[key]); },
     set: function(key, value, cb) { this._data[key] = value; cb(null); }
   };
-  this.mainInstance = main.createInstance(this.dataStore);
+  this.mainInstance = new Main(this.dataStore);
   this.dataStore._data = {
     'content:me/': {a: true, b: true, existing: true},
     'content:me/a': new Buffer('blĳ', 'utf-8'),

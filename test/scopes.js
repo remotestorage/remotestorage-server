@@ -1,4 +1,4 @@
-var scopes = require('../lib/scopes'),
+var Scopes = require('../lib/scopes'),
   nodeunit = require('nodeunit');
   
 function setUp() {
@@ -7,7 +7,7 @@ function setUp() {
     get: function(key, cb) { cb(null, this._data[key]); },
     set: function(key, value, cb) { this._data[key] = value; cb(null); }
   };
-  this.scopesInstance = scopes.createInstance(this.tokenStore);
+  this.scopesInstance = new Scopes(this.tokenStore);
 }
 
 exports['scopes'] = nodeunit.testCase({

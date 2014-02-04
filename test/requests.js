@@ -1,4 +1,4 @@
-var requests = require('../lib/requests'),
+var Requests = require('../lib/requests'),
   nodeunit = require('nodeunit');
   
 function setUp() {
@@ -90,7 +90,7 @@ function setUp() {
       origin: 'http://local.host'
     }
   };
-  this.requestsInstance = requests.createInstance('/path/to/storage/', this.scopesMock, this.mainMock);
+  this.requestsInstance = new Requests('/path/to/storage/', this.scopesMock, this.mainMock);
 }
 
 exports['requests'] = nodeunit.testCase({

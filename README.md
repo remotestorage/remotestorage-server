@@ -10,12 +10,12 @@ The remoteStorage core from https://github.com/remotestorage/starter-kit
 
 ````js
     //set up the remoteStorage server instance:
-    var remotestorageServer = require('remotestorage-server'),
+    var RemotestorageServer = require('remotestorage-server'),
       specVersion = 'draft-dejong-remotestorage-02',
       tokenStore = { _data: {}, get: function(key, cb) { cb(this._data[key]); }, set: function(key, value, cb) { this._data[key] = value; cb(); } },
       dataStore =  { _data: {}, get: function(key, cb) { cb(this._data[key]); }, set: function(key, value, cb) { this._data[key] = value; cb(); } };
 
-    var serverInstance = remotestorageServer.createServer(specVersion, tokenStore, dataStore);
+    var serverInstance = new RemotestorageServer(specVersion, tokenStore, dataStore);
     
     //set up a https server:
     var fs = require('fs'),
