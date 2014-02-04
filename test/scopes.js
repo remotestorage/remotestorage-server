@@ -28,118 +28,363 @@ exports['scopes'] = nodeunit.testCase({
     test.deepEqual(this.scopesInstance.makeScopePaths('me', ['root:rw'], 'root'), ['me/:rw']);
     test.done();
   },
-/*  'mayRead for foo:r': function(test) {
+  'mayRead for foo:r foo': function(test) {
     setUp.bind(this)();
-    test.expect(46);
+    test.expect(24);
     this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:r'])};
-    //foo:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/'), false);
-    //bar:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar/'), false);
-    //root:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo'), false);
-    //outside:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you'), false);
-    //other users:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/'), false);
-    test.done();
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, true);
+      this.scopesInstance.mayRead('Bearer wrong', 'me/foo/', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, false);
+        this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar', function(err, answer) {
+          test.equal(err, null);
+          test.equal(answer, true);
+          this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar', function(err, answer) {
+            test.equal(err, null);
+            test.equal(answer, false);
+            this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/', function(err, answer) {
+              test.equal(err, null);
+              test.equal(answer, true);
+              this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/', function(err, answer) {
+                test.equal(err, null);
+                test.equal(answer, false);
+                this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/', function(err, answer) {
+                  test.equal(err, null);
+                  test.equal(answer, true);
+                  this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/', function(err, answer) {
+                    test.equal(err, null);
+                    test.equal(answer, false);
+                    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar', function(err, answer) {
+                      test.equal(err, null);
+                      test.equal(answer, true);
+                      this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar', function(err, answer) {//public
+                        test.equal(err, null);
+                        test.equal(answer, true);
+                        this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/', function(err, answer) {
+                          test.equal(err, null);
+                          test.equal(answer, true);
+                          this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/', function(err, answer) {
+                            test.equal(err, null);
+                            test.equal(answer, false);
+                            test.done();
+                          }.bind(this));
+                        }.bind(this));
+                      }.bind(this));
+                    }.bind(this));
+                  }.bind(this));
+                }.bind(this));
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
   },
+  'mayRead for foo:r bar': function(test) {
+    setUp.bind(this)();
+    test.expect(24);
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:r'])};
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, false);
+      this.scopesInstance.mayRead('Bearer wrong', 'me/bar/', function(err, answer) {
+        test.equal(err, null);
+        test.equal(answer, false);
+        this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar', function(err, answer) {
+          test.equal(err, null); 
+          test.equal(answer, false);
+          this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar', function(err, answer) { 
+            test.equal(err, null); 
+            test.equal(answer, false);
+            this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar/', function(err, answer) { 
+              test.equal(err, null); 
+              test.equal(answer, false);
+              this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar/', function(err, answer) { 
+                test.equal(err, null); 
+                test.equal(answer, false);
+                this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/', function(err, answer) { 
+                  test.equal(err, null); 
+                  test.equal(answer, false);
+                  this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/', function(err, answer) { 
+                    test.equal(err, null); 
+                    test.equal(answer, false);
+                    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar', function(err, answer) {//public
+                      test.equal(err, null);
+                      test.equal(answer, true);
+                      this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar', function(err, answer) {//public
+                        test.equal(err, null);
+                        test.equal(answer, true);
+                        this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar/', function(err, answer) { 
+                          test.equal(err, null); 
+                          test.equal(answer, false);
+                          this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar/', function(err, answer) { 
+                            test.equal(err, null); 
+                            test.equal(answer, false);
+                            test.done();
+                          }.bind(this));
+                        }.bind(this));
+                      }.bind(this));
+                    }.bind(this));
+                  }.bind(this));
+                }.bind(this));
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
+  },
+  'mayRead for foo:r root': function(test) {
+    setUp.bind(this)();
+    test.expect(12);
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:r'])};
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/', function(err, answer) { 
+      test.equal(err, null); 
+      test.equal(answer, false);
+      this.scopesInstance.mayRead('Bearer wrong', 'me/', function(err, answer) { 
+        test.equal(err, null); 
+        test.equal(answer, false);
+        this.scopesInstance.mayRead('Bearer SECRET', 'me/foo', function(err, answer) { 
+          test.equal(err, null); 
+          test.equal(answer, false);
+          this.scopesInstance.mayRead('Bearer wrong', 'me/bar', function(err, answer) { 
+            test.equal(err, null); 
+            test.equal(answer, false);
+            this.scopesInstance.mayRead('Bearer SECRET', 'me/bar', function(err, answer) { 
+              test.equal(err, null); 
+              test.equal(answer, false);
+              this.scopesInstance.mayRead('Bearer wrong', 'me/foo', function(err, answer) { 
+                test.equal(err, null); 
+                test.equal(answer, false);
+                test.done();
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
+  },
+  'mayRead for foo:r outside': function(test) {
+    setUp.bind(this)();
+    test.expect(12);
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:r'])};
+    this.scopesInstance.mayRead('Bearer SECRET', '', function(err, answer) { 
+      test.equal(err, null); 
+      test.equal(answer, false);
+      this.scopesInstance.mayRead('Bearer wrong', '', function(err, answer) { 
+        test.equal(err, null); 
+        test.equal(answer, false);
+        this.scopesInstance.mayRead('Bearer SECRET', 'me', function(err, answer) { 
+          test.equal(err, null); 
+          test.equal(answer, false);
+          this.scopesInstance.mayRead('Bearer wrong', 'me', function(err, answer) { 
+            test.equal(err, null); 
+            test.equal(answer, false);
+            this.scopesInstance.mayRead('Bearer SECRET', 'you', function(err, answer) { 
+              test.equal(err, null); 
+              test.equal(answer, false);
+              this.scopesInstance.mayRead('Bearer wrong', 'you', function(err, answer) { 
+                test.equal(err, null); 
+                test.equal(answer, false);
+                test.done();
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
+  },
+  'mayRead for foo:r other users': function(test) {
+    setUp.bind(this)();
+    test.expect(20);
+    this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:r'])};
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/', function(err, answer) { 
+      test.equal(err, null); 
+      test.equal(answer, false);
+      this.scopesInstance.mayRead('Bearer wrong', 'you/', function(err, answer) { 
+        test.equal(err, null); 
+        test.equal(answer, false);
+        this.scopesInstance.mayRead('Bearer SECRET', 'you/foo', function(err, answer) { 
+          test.equal(err, null); 
+          test.equal(answer, false);
+          this.scopesInstance.mayRead('Bearer wrong', 'you/foo', function(err, answer) { 
+            test.equal(err, null); 
+            test.equal(answer, false);
+            this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/', function(err, answer) { 
+              test.equal(err, null); 
+              test.equal(answer, false);
+              this.scopesInstance.mayRead('Bearer wrong', 'you/foo/', function(err, answer) { 
+                test.equal(err, null); 
+                test.equal(answer, false);
+                this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar', function(err, answer) { 
+                  test.equal(err, null); 
+                  test.equal(answer, false);
+                  this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar', function(err, answer) { 
+                    test.equal(err, null); 
+                    test.equal(answer, false);
+                    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/', function(err, answer) { 
+                      test.equal(err, null); 
+                      test.equal(answer, false);
+                      this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/', function(err, answer) { 
+                        test.equal(err, null); 
+                        test.equal(answer, false);
+                        test.done();
+                      }.bind(this));
+                    }.bind(this));
+                  }.bind(this));
+                }.bind(this));
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
+  },/*
   'mayRead for foo:rw': function(test) {
     setUp.bind(this)();
     test.expect(46);
     this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:rw'])};
     //foo:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar', function(err, answer) {//public
+    test.equal(err, null);
+    test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //bar:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar', function(err, answer) {//public  test.equal(err, null);  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar', function(err, answer) {//public  test.equal(err, null);  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //root:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //outside:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //other users:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     test.done();
   },
   'mayWrite for foo:r': function(test) {
@@ -147,56 +392,147 @@ exports['scopes'] = nodeunit.testCase({
     test.expect(46);
     this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:r'])};
     //foo:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar/'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null);  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //bar:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar/'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //root:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //outside:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //other users:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     test.done();
   },
   'mayWrite for foo:rw': function(test) {
@@ -204,56 +540,150 @@ exports['scopes'] = nodeunit.testCase({
     test.expect(46);
     this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['foo:rw'])};
     //foo:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar'), true);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar'), true);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar/'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //bar:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar/'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/bar/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //root:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+ 
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //outside:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //other users:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo', function(err, answer) { 
+ 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     test.done();
   },
   'mayRead for :r': function(test) {
@@ -261,43 +691,109 @@ exports['scopes'] = nodeunit.testCase({
     test.expect(34);
     this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['root:r'], 'root')};
     //foo:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar', function(err, answer) {//public  test.equal(err, null);  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //root:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //outside:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //other users:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     test.done();
   },
   'mayRead for :rw': function(test) {
@@ -305,43 +801,111 @@ exports['scopes'] = nodeunit.testCase({
     test.expect(34);
     this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['root:rw'], 'root')};
     //foo:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar'), true);//public
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar', function(err, answer) {//public
+    test.equal(err, null);
+    test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //root:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/foo'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me/bar'), true);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me/foo'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, true);
+    this.scopesInstance.mayRead('Bearer wrong', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //outside:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', ''), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'me'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //other users:
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/'), false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer SECRET', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayRead('Bearer wrong', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     test.done();
   },
   'mayWrite for :r': function(test) {
@@ -349,43 +913,111 @@ exports['scopes'] = nodeunit.testCase({
     test.expect(34);
     this.tokenStore._data = { 'SECRET': this.scopesInstance.makeScopePaths('me', ['*:r'], '*')};
     //foo:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar/'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/public/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //root:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me/foo'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //outside:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', ''), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', ''), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'me'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'me'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'you'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'you'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', '', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'me', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'you', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     //other users:
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'you/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'you/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'you/foo'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'you/foo/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'you/foo/bar'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo/bar/'), false);
-    test.equal(this.scopesInstance.mayWrite('Bearer wrong', 'you/foo/bar/'), false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'you/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'you/foo', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'you/foo/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'you/foo/bar', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer SECRET', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
+    this.scopesInstance.mayWrite('Bearer wrong', 'you/foo/bar/', function(err, answer) { 
+  test.equal(err, null); 
+  test.equal(answer, false);
     test.done();
   },*/
   'mayWrite for :rw - foo': function(test) {
