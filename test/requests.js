@@ -5,15 +5,15 @@ function setUp() {
   this.scopesMock = {
     _mayReadCalled: 0,
     _mayWriteCalled: 0,
-    mayRead: function(authHeader, path) {
+    mayRead: function(authHeader, path, cb) {
       this._mayReadCalled++;
-      return ((authHeader === 'asdfqwer-read' && path === 'qwer/asdf/read')
+      cb(null, (authHeader === 'asdfqwer-read' && path === 'qwer/asdf/read')
           || (authHeader === 'Bearer SECRET' && path === 'me/existing')
           || (authHeader === 'Bearer SECRET' && path === 'me/folder/'));
     },
-    mayWrite: function(authHeader, path) {
+    mayWrite: function(authHeader, path, cb) {
       this._mayWriteCalled++;
-      return ((authHeader === 'asdfqwer-write' && path === 'qwer/asdf/write')
+      cb(null, (authHeader === 'asdfqwer-write' && path === 'qwer/asdf/write')
           || (authHeader === 'Bearer SECRET' && path === 'me/existing')
           || (authHeader === 'Bearer SECRET' && path === 'me/folder/'));
     }
@@ -27,36 +27,37 @@ function setUp() {
     _getContentTypeCalled: 0,
     _setCalled: 0,
     _data: {},
-    condMet: function(cond, path) {
+    condMet: function(cond, path, cb) {
       this._condMetCalled++;
-      return (cond.ifNoneMatch === '*' && path === 'qwer/asdf/cond')
+      cb(null, (cond.ifNoneMatch === '*' && path === 'qwer/asdf/cond')
           || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/existing')
           || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/folder/')
-          || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0] === '123' && path === 'me/existing');
+          || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0] === '123' && path === 'me/existing'));
     },
-    exists: function(path) {
+    exists: function(path, cb) {
       this._existsCalled++;
-      return (path === 'me/existing' || path === 'me/folder/');
+      cb(null, path === 'me/existing' || path === 'me/folder/');
     },
-    getContent: function(path) {
+    getContent: function(path, cb) {
       this._getContentCalled++;
-      return new Buffer('yes, very content!', 'utf-8');
+      cb(null, new Buffer('yes, very content!', 'utf-8'));
     },
-    getFolderDescription: function(path) {
+    getFolderDescription: function(path, cb) {
       this._getFolderDescriptionCalled++;
-      return {a: 'b'};
+      cb(null, {a: 'b'});
     },
-    getContentType: function(path) {
+    getContentType: function(path, cb) {
       this._getContentTypeCalled++;
-      return 'very!';
+      cb(null, 'very!');
     },
-    getRevision: function(path) {
+    getRevision: function(path, cb) {
       this._getRevisionCalled++;
-      return 'koe';
+      cb(null, 'koe');
     },
-    set: function(path, buf, contentType, revision) {
+    set: function(path, buf, contentType, revision, cb) {
       this._setCalled++;
       this._data[path] = [buf, contentType, revision];
+      cb(null);
     }
   };
   this.res = {
@@ -152,48 +153,63 @@ exports['requests'] = nodeunit.testCase({
   },
   'checkNoFolder': function(test) {
     setUp.bind(this)();
-    this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo');
-    test.equal(this.res._headers, undefined);
-    test.equal(this.res._body, '');
-    test.equal(this.res._ended, false);
-    test.equal(this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo/'), undefined);
-    test.deepEqual(this.res._headers, {
-      'Access-Control-Allow-Origin': 'http://local.host',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
-      'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
-      'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
-      Expires: '0',
-      'content-type': 'text/plain',
-      'content-length': '20'
-    });
-    test.equal(this.res._body, '400 Computer says no');
-    test.equal(this.res._ended, true);
-    test.done();
+    test.expect(8);
+    this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo', function(err, answer) {
+      test.equal(err, null);
+      test.equal(answer, true);
+      test.equal(this.res._headers, undefined);
+      test.equal(this.res._body, '');
+      test.equal(this.res._ended, false);
+      this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo/', function(err, answer) {
+        test.equal(true, false);
+      }.bind(this));
+      test.deepEqual(this.res._headers, {
+        'Access-Control-Allow-Origin': 'http://local.host',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
+        'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        Expires: '0',
+        'content-type': 'text/plain',
+        'content-length': '20'
+      });
+      test.equal(this.res._body, '400 Computer says no');
+      test.equal(this.res._ended, true);
+      test.done();
+    }.bind(this));
   },
   'checkMayRead': function(test) {
     setUp.bind(this)();
+    test.expect(11);
     this.req.headers.authorization = 'asdfqwer-read';
-    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read'), true);
-    test.equal(this.scopesMock._mayReadCalled, 1);
-    test.equal(this.res._status, undefined);
-    test.equal(this.res._headers, undefined);
-    test.equal(this.res._body, '');
-    test.equal(this.res._ended, false);
-    this.req.headers.authorization = 'asdfqwer-wrong';
-    test.equal(this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read'), undefined);
-    test.equal(this.scopesMock._mayReadCalled, 2);
-    test.equal(this.res._status, 401);
-    test.deepEqual(this.res._headers, {
-      "Access-Control-Allow-Origin":"http://local.host",
-      "Access-Control-Allow-Headers":"Content-Type, Authorization, Origin, If-Match, If-None-Match",
-      "Access-Control-Expose-Headers":"Content-Type, Content-Length, ETag",
-      "Access-Control-Allow-Methods":"GET, PUT, DELETE",
-      "Expires":"0",
-      "content-type":"text/plain",
-      "content-length":"16"});
-    test.equal(this.res._body, '401 Unauthorized');
-    test.equal(this.res._ended, true);
-    test.done();
+    console.log('1');
+    this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read', function(err, answer) {
+    console.log('2');
+      test.equal(err, null);
+      test.equal(answer, true);
+      test.equal(this.scopesMock._mayReadCalled, 1);
+      test.equal(this.res._status, undefined);
+      test.equal(this.res._headers, undefined);
+      test.equal(this.res._body, '');
+      test.equal(this.res._ended, false);
+      this.req.headers.authorization = 'asdfqwer-wrong';
+      this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read', function(err, answer) {
+        test.equal(true, false);
+      }.bind(this));
+    console.log('3');
+      test.equal(this.scopesMock._mayReadCalled, 2);
+      test.equal(this.res._status, 401);
+      test.deepEqual(this.res._headers, {
+        "Access-Control-Allow-Origin":"http://local.host",
+        "Access-Control-Allow-Headers":"Content-Type, Authorization, Origin, If-Match, If-None-Match",
+        "Access-Control-Expose-Headers":"Content-Type, Content-Length, ETag",
+        "Access-Control-Allow-Methods":"GET, PUT, DELETE",
+        "Expires":"0",
+        "content-type":"text/plain",
+        "content-length":"16"});
+      test.equal(this.res._body, '401 Unauthorized');
+      test.equal(this.res._ended, true);
+      test.done();
+    });
   },
   'checkMayWrite': function(test) {
     setUp.bind(this)();

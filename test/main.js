@@ -1,5 +1,4 @@
-var Q = require('q'),
-  main = require('../lib/main'),
+var main = require('../lib/main'),
   nodeunit = require('nodeunit');
   
 function setUp() {
