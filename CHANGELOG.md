@@ -1,3 +1,6 @@
+# 0.3.1 (Feb 2014)
+* avoid duplicate storage of revisions in folder listings
+
 # 0.3.0 (Feb 2014)
 * receive PUT body as buffer
 * use sha1 for generating ETags
