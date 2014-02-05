@@ -104,9 +104,10 @@ exports['requests'] = nodeunit.testCase({
     test.equal(this.res._status, 207);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+      'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
       'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
       'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+      'Cache-Control': 'no-cache, no-store',
       Expires: '0',
       etag: '"123"',
       'content-type': 'application/json',
@@ -122,9 +123,10 @@ exports['requests'] = nodeunit.testCase({
     test.equal(this.res._status, 200);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+      'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
       'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
       'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+      'Cache-Control': 'no-cache, no-store',
       Expires: '0',
       etag: '"123"',
       'content-type': 'application/json',
@@ -139,9 +141,10 @@ exports['requests'] = nodeunit.testCase({
     test.equal(this.res._status, 408);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+      'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
       'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
       'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+      'Cache-Control': 'no-cache, no-store',
       Expires: '0',
       etag: '"123"',
       'content-type': 'text/plain',
@@ -165,9 +168,10 @@ exports['requests'] = nodeunit.testCase({
       }.bind(this));
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         Expires: '0',
         'content-type': 'text/plain',
         'content-length': '20'
@@ -197,9 +201,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 401);
       test.deepEqual(this.res._headers, {
         "Access-Control-Allow-Origin":"http://local.host",
-        "Access-Control-Allow-Headers":"Content-Type, Authorization, Origin, If-Match, If-None-Match",
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         "Access-Control-Expose-Headers":"Content-Type, Content-Length, ETag",
         "Access-Control-Allow-Methods":"GET, PUT, DELETE",
+        'Cache-Control': 'no-cache, no-store',
         "Expires":"0",
         "content-type":"text/plain",
         "content-length":"16"});
@@ -227,9 +232,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 401);
       test.deepEqual(this.res._headers, {
         "Access-Control-Allow-Origin":"http://local.host",
-        "Access-Control-Allow-Headers":"Content-Type, Authorization, Origin, If-Match, If-None-Match",
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         "Access-Control-Expose-Headers":"Content-Type, Content-Length, ETag",
         "Access-Control-Allow-Methods":"GET, PUT, DELETE",
+        'Cache-Control': 'no-cache, no-store',
         "Expires":"0",
         "content-type":"text/plain",
         "content-length":"16"});
@@ -274,9 +280,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 409);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'etag': '"koe"',
         'content-type': 'text/plain',
@@ -306,9 +313,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 404);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'content-type': 'text/plain',
         'content-length': '13'});
@@ -326,9 +334,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 405);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'content-type': 'text/plain',
         'content-length': '22'
@@ -356,9 +365,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0'
       });
       test.equal(this.res._body, '');
@@ -384,9 +394,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'etag': '"koe"',
         'content-length': '18',
@@ -415,9 +426,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'etag': '"koe"',
         'content-type': 'asdf'
@@ -446,9 +458,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'etag': '"koe"',
         'content-length': '18',
@@ -478,9 +491,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'etag': '"koe"',
         'content-length': '9',
@@ -513,9 +527,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
         'etag': '"' + this.mainMock._data['me/existing'][2] + '"'
       });
@@ -556,9 +571,10 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, If-Match, If-None-Match',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
         'Access-Control-Expose-Headers': 'Content-Type, Content-Length, ETag',
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
+        'Cache-Control': 'no-cache, no-store',
         'Expires': '0'
       });
       test.equal(this.res._body, '');
