@@ -206,6 +206,7 @@ exports['requests'] = nodeunit.testCase({
         "Access-Control-Allow-Methods":"GET, PUT, DELETE",
         'Cache-Control': 'no-cache, no-store',
         "Expires":"0",
+        'WWW-Authenticate': 'Bearer realm="remoteStorage" error="invalid_token"',
         "content-type":"text/plain",
         "content-length":"16"});
       test.equal(this.res._body, '401 Unauthorized');
@@ -237,6 +238,7 @@ exports['requests'] = nodeunit.testCase({
         "Access-Control-Allow-Methods":"GET, PUT, DELETE",
         'Cache-Control': 'no-cache, no-store',
         "Expires":"0",
+        'WWW-Authenticate': 'Bearer realm="remoteStorage" error="invalid_token"',
         "content-type":"text/plain",
         "content-length":"16"});
       test.equal(this.res._body, '401 Unauthorized');
