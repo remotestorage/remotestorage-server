@@ -1,3 +1,6 @@
+# 0.2.3 (Feb 2014)
+* no body and no Content-Length header in 304 responses
+
 # 0.2.2 (Feb 2014)
 * add WWW-Authenticate header
 
