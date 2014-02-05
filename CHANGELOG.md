@@ -1,3 +1,7 @@
+# 0.3.0 (Feb 2014)
+* receive PUT body as buffer
+* use sha1 for generating ETags
+
 # 0.2.4 (Feb 2014)
 * error checking
 
