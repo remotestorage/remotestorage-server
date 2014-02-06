@@ -1,3 +1,7 @@
+# 0.3.2 (Feb 2014)
+* more efficient document existence ,based on revision instead content
+* fix webfinger for legacy spec versions
+
 # 0.3.1 (Feb 2014)
 * avoid duplicate storage of revisions in folder listings
 
