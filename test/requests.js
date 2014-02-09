@@ -5,17 +5,17 @@ function setUp() {
   this.scopesMock = {
     _mayReadCalled: 0,
     _mayWriteCalled: 0,
-    mayRead: function(authHeader, path, cb) {
+    mayRead: function(authHeader, username, path, cb) {
       this._mayReadCalled++;
-      cb(null, (authHeader === 'asdfqwer-read' && path === 'qwer/asdf/read')
-          || (authHeader === 'Bearer SECRET' && path === 'me/existing')
-          || (authHeader === 'Bearer SECRET' && path === 'me/folder/'));
+      cb(null, (authHeader === 'asdfqwer-read' && path === '/qwer/asdf/read')
+          || (authHeader === 'Bearer SECRET' && path === '/existing')
+          || (authHeader === 'Bearer SECRET' && path === '/folder/'));
     },
-    mayWrite: function(authHeader, path, cb) {
+    mayWrite: function(authHeader, username, path, cb) {
       this._mayWriteCalled++;
-      cb(null, (authHeader === 'asdfqwer-write' && path === 'qwer/asdf/write')
-          || (authHeader === 'Bearer SECRET' && path === 'me/existing')
-          || (authHeader === 'Bearer SECRET' && path === 'me/folder/'));
+      cb(null, (authHeader === 'asdfqwer-write' && path === '/qwer/asdf/write')
+          || (authHeader === 'Bearer SECRET' && path === '/existing')
+          || (authHeader === 'Bearer SECRET' && path === '/folder/'));
     }
   };
   this.mainMock = {
@@ -27,36 +27,36 @@ function setUp() {
     _getContentTypeCalled: 0,
     _setCalled: 0,
     _data: {},
-    condMet: function(cond, path, cb) {
+    condMet: function(cond, username, path, cb) {
       this._condMetCalled++;
-      cb(null, (cond.ifNoneMatch === '*' && path === 'qwer/asdf/cond')
-          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/existing')
-          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === 'me/folder/')
-          || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0] === '123' && path === 'me/existing'));
+      cb(null, (cond.ifNoneMatch === '*' && path === '/qwer/asdf/cond')
+          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === '/existing')
+          || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === '/folder/')
+          || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0] === '123' && path === '/existing'));
     },
-    exists: function(path, cb) {
+    exists: function(username, path, cb) {
       this._existsCalled++;
-      cb(null, path === 'me/existing' || path === 'me/folder/');
+      cb(null, path === '/existing' || path === '/folder/');
     },
-    getContent: function(path, cb) {
+    getContent: function(username, path, cb) {
       this._getContentCalled++;
       cb(null, new Buffer('yes, very content!', 'utf-8'));
     },
-    getFolderDescription: function(path, format, cb) {
+    getFolderDescription: function(username, path, format, cb) {
       this._getFolderDescriptionCalled++;
       cb(null, {a: 'b'});
     },
-    getContentType: function(path, cb) {
+    getContentType: function(username, path, cb) {
       this._getContentTypeCalled++;
       cb(null, 'very!');
     },
-    getRevision: function(path, cb) {
+    getRevision: function(username, path, cb) {
       this._getRevisionCalled++;
       cb(null, 'koe');
     },
-    set: function(path, buf, contentType, revision, cb) {
+    set: function(username, path, buf, contentType, revision, cb) {
       this._setCalled++;
-      this._data[path] = [buf, contentType, revision];
+      this._data[username+':'+path] = [buf, contentType, revision];
       cb(null);
     }
   };
@@ -157,13 +157,13 @@ exports['requests'] = nodeunit.testCase({
   'checkNoFolder': function(test) {
     setUp.bind(this)();
     test.expect(8);
-    this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo', function(err, answer) {
+    this.requestsInstance.checkNoFolder(this.req, this.res, 'me', '/foo', function(err, answer) {
       test.equal(err, null);
       test.equal(answer, true);
       test.equal(this.res._headers, undefined);
       test.equal(this.res._body, '');
       test.equal(this.res._ended, false);
-      this.requestsInstance.checkNoFolder(this.req, this.res, 'me/foo/', function(err, answer) {
+      this.requestsInstance.checkNoFolder(this.req, this.res, 'me', '/foo/', function(err, answer) {
         test.equal(true, false);
       }.bind(this));
       test.deepEqual(this.res._headers, {
@@ -185,7 +185,7 @@ exports['requests'] = nodeunit.testCase({
     setUp.bind(this)();
     test.expect(12);
     this.req.headers.authorization = 'asdfqwer-read';
-    this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read', function(err, answer) {
+    this.requestsInstance.checkMayRead(this.req, this.res, 'me', '/qwer/asdf/read', function(err, answer) {
       test.equal(err, null);
       test.equal(answer, true);
       test.equal(this.scopesMock._mayReadCalled, 1);
@@ -194,7 +194,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._body, '');
       test.equal(this.res._ended, false);
       this.req.headers.authorization = 'asdfqwer-wrong';
-      this.requestsInstance.checkMayRead(this.req, this.res, 'qwer/asdf/read', function(err, answer) {
+      this.requestsInstance.checkMayRead(this.req, this.res, 'me', '/qwer/asdf/read', function(err, answer) {
         test.equal(true, false);
       }.bind(this));
       test.equal(this.scopesMock._mayReadCalled, 2);
@@ -217,7 +217,7 @@ exports['requests'] = nodeunit.testCase({
   'checkMayWrite': function(test) {
     setUp.bind(this)();
     this.req.headers.authorization = 'asdfqwer-write';
-    this.requestsInstance.checkMayWrite(this.req, this.res, 'qwer/asdf/write', function(err, answer) {
+    this.requestsInstance.checkMayWrite(this.req, this.res, 'me', '/qwer/asdf/write', function(err, answer) {
       test.equal(err, null);
       test.equal(answer, true);
       test.equal(this.scopesMock._mayWriteCalled, 1);
@@ -226,7 +226,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._body, '');
       test.equal(this.res._ended, false);
       this.req.headers.authorization = 'asdfqwer-wrong';
-      this.requestsInstance.checkMayWrite(this.req, this.res, 'qwer/asdf/write', function(err, answer) {
+      this.requestsInstance.checkMayWrite(this.req, this.res, 'me', '/qwer/asdf/write', function(err, answer) {
         test.equal(false, true);
       });
       test.equal(this.scopesMock._mayWriteCalled, 2);
@@ -264,7 +264,7 @@ exports['requests'] = nodeunit.testCase({
   'checkCondMet': function(test) {
     setUp.bind(this)();
     this.req.headers['if-none-match'] = '*';
-    this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond', 412, function(err, answer) {
+    this.requestsInstance.checkCondMet(this.req, this.res, 'me', '/qwer/asdf/cond', 412, function(err, answer) {
       test.equal(err, null);
       test.equal(answer, true);
       test.equal(this.mainMock._condMetCalled, 1);
@@ -275,7 +275,7 @@ exports['requests'] = nodeunit.testCase({
       this.req.headers = {};
       this.req.headers.authorization = 'asdfqwer-wrong';
       this.req.headers['if-match'] = 'aap';
-      this.requestsInstance.checkCondMet(this.req, this.res, 'qwer/asdf/cond', 409, function(err, answer) {
+      this.requestsInstance.checkCondMet(this.req, this.res, 'me', '/qwer/asdf/cond', 409, function(err, answer) {
         test.equal(false, true);
       });
       test.equal(this.mainMock._condMetCalled, 2);
@@ -300,7 +300,7 @@ exports['requests'] = nodeunit.testCase({
     this.req.headers = {
       origin: 'http://local.host'
     };
-    this.requestsInstance.checkFound(this.req, this.res, 'me/existing', function(err, answer) {
+    this.requestsInstance.checkFound(this.req, this.res, 'me', '/existing', function(err, answer) {
       test.equal(err, null);
       test.equal(answer, true);
       test.equal(this.mainMock._existsCalled, 1);
@@ -308,7 +308,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._headers, undefined);
       test.equal(this.res._body, '');
       test.equal(this.res._ended, false);
-      this.requestsInstance.checkFound(this.req, this.res, 'me/non-existing', function(err, answer) {
+      this.requestsInstance.checkFound(this.req, this.res, 'me', '/non-existing', function(err, answer) {
         test.equal(false, true);
       });
       test.equal(this.mainMock._existsCalled, 2);

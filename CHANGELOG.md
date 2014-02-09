@@ -1,3 +1,6 @@
+# 0.4.0 (Feb 2014)
+* partition tokenStore and dataStore per user
+
 # 0.3.2 (Feb 2014)
 * more efficient document existence ,based on revision instead content
 * fix webfinger for legacy spec versions

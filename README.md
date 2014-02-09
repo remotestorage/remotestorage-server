@@ -12,8 +12,16 @@ The remoteStorage core from https://github.com/remotestorage/starter-kit
     //set up the remoteStorage server instance:
     var RemotestorageServer = require('remotestorage-server'),
       specVersion = 'draft-dejong-remotestorage-02',
-      tokenStore = { _data: {}, get: function(key, cb) { cb(this._data[key]); }, set: function(key, value, cb) { this._data[key] = value; cb(); } },
-      dataStore =  { _data: {}, get: function(key, cb) { cb(this._data[key]); }, set: function(key, value, cb) { this._data[key] = value; cb(); } };
+      tokenStore = { _data: {}, get: function(username, token, cb) {
+        cb(this._data[username+':'+token]);
+      }, set: function(username, token, scopes, cb) {
+        this._data[username+':'+token] = scopes; cb(); } },
+      dataStore =  { _data: {}, get: function(username, key, cb) {
+        cb(this._data[username+':'+key]);
+      }, set: function(username, key, value, cb) {
+        this._data[usernae+':'+key] = value; cb();
+      }
+    };
 
     var serverInstance = new RemotestorageServer(specVersion, tokenStore, dataStore);
     
@@ -27,8 +35,8 @@ The remoteStorage core from https://github.com/remotestorage/starter-kit
       };
 
     //add access tokens (you would typically do this from an ajax call in your OAuth dialog):
-    tokenStore._data['SECRET'] = serverInstance.makeScopePaths('me', ['tasks:rw', 'contacts:r']);
-    tokenStore._data['GOD'] = serverInstance.makeScopePaths('me', ['*:rw']);
+    tokenStore._data['me:SECRET'] = serverInstance.makeScopePaths(['tasks:rw', 'contacts:r']);
+    tokenStore._data['me:GOD'] = serverInstance.makeScopePaths(['*:rw']);
 
     //serve storage:
     https.createServer(httpsConfig, serverInstance.storage).listen(8000);
