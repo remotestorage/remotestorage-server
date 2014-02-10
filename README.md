@@ -13,13 +13,13 @@ The remoteStorage core from https://github.com/remotestorage/starter-kit
     var RemotestorageServer = require('remotestorage-server'),
       specVersion = 'draft-dejong-remotestorage-02',
       tokenStore = { _data: {}, get: function(username, token, cb) {
-        cb(this._data[username+':'+token]);
+        cb(null, this._data[username+':'+token]);
       }, set: function(username, token, scopes, cb) {
-        this._data[username+':'+token] = scopes; cb(); } },
+        this._data[username+':'+token] = scopes; cb(null); } },
       dataStore =  { _data: {}, get: function(username, key, cb) {
-        cb(this._data[username+':'+key]);
+        cb(null, this._data[username+':'+key]);
       }, set: function(username, key, value, cb) {
-        this._data[usernae+':'+key] = value; cb();
+        this._data[usernae+':'+key] = value; cb(null);
       }
     };
 
