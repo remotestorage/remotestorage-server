@@ -1,3 +1,6 @@
+# 0.4.1 (Feb 2014)
+* fix bug in README code example
+
 # 0.4.0 (Feb 2014)
 * partition tokenStore and dataStore per user
 
