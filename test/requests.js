@@ -523,9 +523,9 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.scopesMock._mayReadCalled, 0);
       test.equal(this.scopesMock._mayWriteCalled, 1);
       test.equal(this.mainMock._setCalled, 1);
-      test.equal(this.mainMock._data['me/existing'][0], 'i put you');
-      test.equal(this.mainMock._data['me/existing'][1], undefined);
-      test.equal(typeof(this.mainMock._data['me/existing'][2]), 'string');
+      test.equal(this.mainMock._data['me:/existing'][0], 'i put you');
+      test.equal(this.mainMock._data['me:/existing'][1], undefined);
+      test.equal(typeof(this.mainMock._data['me:/existing'][2]), 'string');
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
@@ -534,7 +534,7 @@ exports['requests'] = nodeunit.testCase({
         'Access-Control-Allow-Methods': 'GET, PUT, DELETE',
         'Cache-Control': 'no-cache, no-store',
         'Expires': '0',
-        'etag': '"' + this.mainMock._data['me/existing'][2] + '"'
+        'etag': '"' + this.mainMock._data['me:/existing'][2] + '"'
       });
       test.equal(this.res._body, '');
       test.equal(this.res._ended, true);
@@ -567,9 +567,9 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.scopesMock._mayReadCalled, 0);
       test.equal(this.scopesMock._mayWriteCalled, 1);
       test.equal(this.mainMock._setCalled, 1);
-      test.equal(this.mainMock._data['me/existing'][0], undefined);
-      test.equal(this.mainMock._data['me/existing'][1], undefined);
-      test.equal(this.mainMock._data['me/existing'][2], undefined);
+      test.equal(this.mainMock._data['me:/existing'][0], undefined);
+      test.equal(this.mainMock._data['me:/existing'][1], undefined);
+      test.equal(this.mainMock._data['me:/existing'][2], undefined);
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
