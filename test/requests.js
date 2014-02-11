@@ -541,6 +541,14 @@ exports['requests'] = nodeunit.testCase({
       test.done();
     }.bind(this));
     this.req = {
+      _queuedData: false,
+      _dataCb: function(buf) {
+        this._queuedData = buf;
+      },
+      _queuedEnd: false,
+      _endCb: function() {
+        this._queuedEnd = true;
+      },
       method: 'PUT',
       url: '/path/to/storage/me/existing',
       headers: {
@@ -550,8 +558,14 @@ exports['requests'] = nodeunit.testCase({
       },
       on: function(event, cb) {
         if (event === 'data') {
+          if(this._queuedData) {
+            cb(this._queuedData);
+          };
           this._dataCb = cb;
         } else if (event === 'end') {
+          if(this._queuedEnd) {
+            cb();
+          };
           this._endCb = cb;
         }
       }

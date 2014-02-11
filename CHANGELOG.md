@@ -1,3 +1,6 @@
+# 0.5.0 (Feb 2014)
+* safely handle execution of concurrent http requests
+
 # 0.4.1 (Feb 2014)
 * fix bug in README code example
 
