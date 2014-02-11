@@ -12,14 +12,14 @@ function setUp() {
     'me:content:/': JSON.stringify({a: true, b: true, existing: true}),
     'me:content:/a': new Buffer('blĳ', 'utf-8'),
     'me:content:/b': new Buffer('Unhošť', 'utf-8'),
-    'me:content:/existing': 'hi',
-    'me:contentType:/a': 'a-ish',
-    'me:contentType:/b': 'b-ish',
-    'me:contentType:/existing': 'hi',
-    'me:revision:/': '123',
-    'me:revision:/a': 'a',
-    'me:revision:/b': 'b',
-    'me:revision:/existing': 'hi',
+    'me:content:/existing': new Buffer('hi', 'utf-8'),
+    'me:contentType:/a': new Buffer('a-ish', 'utf-8'),
+    'me:contentType:/b': new Buffer('b-ish', 'utf-8'),
+    'me:contentType:/existing': new Buffer('hi', 'utf-8'),
+    'me:revision:/': new Buffer('123', 'utf-8'),
+    'me:revision:/a': new Buffer('a', 'utf-8'),
+    'me:revision:/b': new Buffer('b', 'utf-8'),
+    'me:revision:/existing': new Buffer('hi', 'utf-8'),
   };
 }
 

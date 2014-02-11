@@ -48,15 +48,17 @@ function setUp() {
     },
     getContentType: function(username, path, cb) {
       this._getContentTypeCalled++;
-      cb(null, 'very!');
+      cb(null, new Buffer('very!', 'utf-8'));
     },
     getRevision: function(username, path, cb) {
       this._getRevisionCalled++;
       cb(null, new Buffer('koe', 'utf-8'));
     },
     set: function(username, path, buf, contentType, revision, cb) {
+      console.log('mainMock set');
       this._setCalled++;
       this._data[username+':'+path] = [buf, contentType, revision];
+      console.log('stored', buf, contentType, revision);
       cb(null);
     }
   };
@@ -100,7 +102,7 @@ exports['requests'] = nodeunit.testCase({
   },*/
   'writeHead': function(test) {
     setUp.bind(this)();
-    this.requestsInstance.writeHead(this.res, 207, 'https://foo.bar', new Buffer('123', 'utf-8'), 'application/json', 456);
+    this.requestsInstance.writeHead(this.res, 207, 'https://foo.bar', new Buffer('123', 'utf-8'), new Buffer('application/json', 'utf-8'), 456);
     test.equal(this.res._status, 207);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
@@ -119,7 +121,7 @@ exports['requests'] = nodeunit.testCase({
   },
   'writeRaw': function(test) {
     setUp.bind(this)();
-    this.requestsInstance.writeRaw(this.res, 'application/json', new Buffer('asdf', 'utf-8'), 'https://foo.bar', new Buffer('123', 'utf-8'));
+    this.requestsInstance.writeRaw(this.res, new Buffer('application/json', 'utf-8'), new Buffer('asdf', 'utf-8'), 'https://foo.bar', new Buffer('123', 'utf-8'));
     test.equal(this.res._status, 200);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
@@ -417,7 +419,7 @@ exports['requests'] = nodeunit.testCase({
         authorization: 'Bearer SECRET'
       }
     };
-    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', new Buffer('asdf', 'utf-8'));
   },
   'HEAD verb folder': function(test) {
     setUp.bind(this)();
@@ -448,7 +450,7 @@ exports['requests'] = nodeunit.testCase({
         authorization: 'Bearer SECRET'
       }
     };
-    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', new Buffer('asdf', 'utf-8'));
   },
   'GET verb document': function(test) {
     setUp.bind(this)();
@@ -481,7 +483,7 @@ exports['requests'] = nodeunit.testCase({
         authorization: 'Bearer SECRET'
       }
     };
-    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', new Buffer('asdf', 'utf-8'));
   },
   'GET verb folder': function(test) {
     setUp.bind(this)();
@@ -514,7 +516,7 @@ exports['requests'] = nodeunit.testCase({
         authorization: 'Bearer SECRET'
       }
     };
-    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', 'asdf');
+    this.requestsInstance.handleRequest(this.req, this.res, 'etags-only', new Buffer('asdf', 'utf-8'));
   },
   'PUT verb': function(test) {
     setUp.bind(this)();
