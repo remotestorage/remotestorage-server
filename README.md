@@ -18,8 +18,8 @@ The remoteStorage core from https://github.com/remotestorage/starter-kit
         this._data[username+':'+token] = scopes; cb(null); } },
       dataStore =  { _data: {}, get: function(username, key, cb) {
         cb(null, this._data[username+':'+key]);
-      }, set: function(username, key, value, cb) {
-        this._data[usernae+':'+key] = value; cb(null);
+      }, set: function(username, key, buf, cb) {
+        this._data[usernae+':'+key] = buf; cb(null);
       }
     };
 

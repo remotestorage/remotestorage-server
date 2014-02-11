@@ -1,3 +1,6 @@
+# 0.5.1 (Feb 2014)
+* store only Buffers in the dataStore
+
 # 0.5.0 (Feb 2014)
 * safely handle execution of concurrent http requests
 
