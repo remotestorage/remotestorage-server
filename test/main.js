@@ -9,7 +9,7 @@ function setUp() {
   };
   this.mainInstance = new Main(this.dataStore);
   this.dataStore._data = {
-    'me:content:/': {a: true, b: true, existing: true},
+    'me:content:/': JSON.stringify({a: true, b: true, existing: true}),
     'me:content:/a': new Buffer('blĳ', 'utf-8'),
     'me:content:/b': new Buffer('Unhošť', 'utf-8'),
     'me:content:/existing': 'hi',
