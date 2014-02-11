@@ -1,3 +1,6 @@
+# 0.5.3 (Feb 2014)
+* fix contentTypes were still stored as strings instead of Buffers
+
 # 0.5.2 (Feb 2014)
 * fix revisions were still stored as strings instead of Buffers
 
