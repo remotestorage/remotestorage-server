@@ -32,7 +32,7 @@ function setUp() {
       cb(null, (cond.ifNoneMatch === '*' && path === '/qwer/asdf/cond')
           || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === '/existing')
           || (cond.ifNoneMatch === undefined && cond.ifMatch === undefined && path === '/folder/')
-          || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0] === '123' && path === '/existing'));
+          || (Array.isArray(cond.ifNoneMatch) && cond.ifNoneMatch[0].toString('utf-8') === '123' && path === '/existing'));
     },
     exists: function(username, path, cb) {
       this._existsCalled++;
@@ -52,7 +52,7 @@ function setUp() {
     },
     getRevision: function(username, path, cb) {
       this._getRevisionCalled++;
-      cb(null, 'koe');
+      cb(null, new Buffer('koe', 'utf-8'));
     },
     set: function(username, path, buf, contentType, revision, cb) {
       this._setCalled++;
@@ -100,7 +100,7 @@ exports['requests'] = nodeunit.testCase({
   },*/
   'writeHead': function(test) {
     setUp.bind(this)();
-    this.requestsInstance.writeHead(this.res, 207, 'https://foo.bar', '123', 'application/json', 456);
+    this.requestsInstance.writeHead(this.res, 207, 'https://foo.bar', new Buffer('123', 'utf-8'), 'application/json', 456);
     test.equal(this.res._status, 207);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
@@ -119,7 +119,7 @@ exports['requests'] = nodeunit.testCase({
   },
   'writeRaw': function(test) {
     setUp.bind(this)();
-    this.requestsInstance.writeRaw(this.res, 'application/json', new Buffer('asdf', 'utf-8'), 'https://foo.bar', '123');
+    this.requestsInstance.writeRaw(this.res, 'application/json', new Buffer('asdf', 'utf-8'), 'https://foo.bar', new Buffer('123', 'utf-8'));
     test.equal(this.res._status, 200);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
@@ -137,7 +137,7 @@ exports['requests'] = nodeunit.testCase({
   },
   'respond': function(test) {
     setUp.bind(this)();
-    this.requestsInstance.respond(this.res, 'https://foo.bar', 408, '123');
+    this.requestsInstance.respond(this.res, 'https://foo.bar', 408, new Buffer('123', 'utf-8'));
     test.equal(this.res._status, 408);
     test.deepEqual(this.res._headers, {
       'Access-Control-Allow-Origin': 'https://foo.bar',
@@ -248,17 +248,17 @@ exports['requests'] = nodeunit.testCase({
   },
   'stripQuotes': function(test) {
     setUp.bind(this)();
-    test.deepEqual(this.requestsInstance.stripQuotes(''), ['']);
-    test.deepEqual(this.requestsInstance.stripQuotes('""'), ['']);
-    test.deepEqual(this.requestsInstance.stripQuotes('"a"'), ['a']);
-    test.deepEqual(this.requestsInstance.stripQuotes('"a","b"'), ['a', 'b']);
-    test.deepEqual(this.requestsInstance.stripQuotes('a,b'), ['a', 'b']);
-    test.deepEqual(this.requestsInstance.stripQuotes('"asdf","qw er"'), ['asdf', 'qw er']);
-    test.deepEqual(this.requestsInstance.stripQuotes('as df,qwer'), ['as df', 'qwer']);
-    test.deepEqual(this.requestsInstance.stripQuotes('"asdf", "qw er"'), ['asdf', 'qw er']);
-    test.deepEqual(this.requestsInstance.stripQuotes('as df , qwer'), ['as df', 'qwer']);
-    test.deepEqual(this.requestsInstance.stripQuotes(' "asdf"  ,    "qw er"   '), ['asdf', 'qw er']);
-    test.deepEqual(this.requestsInstance.stripQuotes('   as df    ,qwer    '), ['as df', 'qwer']);
+    test.deepEqual(this.requestsInstance.stripQuotes(''), [new Buffer('', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('""'), [new Buffer('', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('"a"'), [new Buffer('a', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('"a","b"'), [new Buffer('a', 'utf-8'), new Buffer('b', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('a,b'), [new Buffer('a', 'utf-8'), new Buffer('b', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('"asdf","qw er"'), [new Buffer('asdf', 'utf-8'), new Buffer('qw er', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('as df,qwer'), [new Buffer('as df', 'utf-8'), new Buffer('qwer', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('"asdf", "qw er"'), [new Buffer('asdf', 'utf-8'), new Buffer('qw er', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('as df , qwer'), [new Buffer('as df', 'utf-8'), new Buffer('qwer', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes(' "asdf"  ,    "qw er"   '), [new Buffer('asdf', 'utf-8'), new Buffer('qw er', 'utf-8')]);
+    test.deepEqual(this.requestsInstance.stripQuotes('   as df    ,qwer    '), [new Buffer('as df', 'utf-8'), new Buffer('qwer', 'utf-8')]);
     test.done();
   },
   'checkCondMet': function(test) {
@@ -525,7 +525,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.mainMock._setCalled, 1);
       test.equal(this.mainMock._data['me:/existing'][0], 'i put you');
       test.equal(this.mainMock._data['me:/existing'][1], undefined);
-      test.equal(typeof(this.mainMock._data['me:/existing'][2]), 'string');
+      test.equal(Buffer.isBuffer(this.mainMock._data['me:/existing'][2]), true);
       test.equal(this.res._status, 200);
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
