@@ -1,3 +1,6 @@
+# 0.5.4 (Feb 2014)
+* fix bug in makeScopePaths function
+
 # 0.5.3 (Feb 2014)
 * fix contentTypes were still stored as strings instead of Buffers
 
