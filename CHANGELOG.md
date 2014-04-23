@@ -1,3 +1,6 @@
+# 0.5.6 (Apr 2014)
+* fix folder revisions
+
 # 0.5.5 (Feb 2014)
 * fix bug with attaching > 1 listener to res.on('end')
 
