@@ -1,3 +1,6 @@
+# 0.5.7 (May 2014)
+* fix cases where requests stayed pending without being serviced
+
 # 0.5.6 (Apr 2014)
 * fix folder revisions
 
