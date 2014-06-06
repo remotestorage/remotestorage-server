@@ -1,3 +1,6 @@
+# 0.5.9 (Jun 2014)
+* fix two mistakes in the empty-folder implementation
+
 # 0.5.8 (Jun 2014)
 * add support for draft-dejong-remotestorage-03
 * fix tests
