@@ -167,7 +167,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._ended, false);
       this.requestsInstance.checkNoFolder(this.req, this.res, 'me', '/foo/', function(err, answer) {
         test.equal(true, false);
-      }.bind(this));
+      }.bind(this), function() {});
       test.deepEqual(this.res._headers, {
         'Access-Control-Allow-Origin': 'http://local.host',
         'Access-Control-Allow-Headers': 'Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With',
@@ -181,7 +181,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._body, '400 Computer says no');
       test.equal(this.res._ended, true);
       test.done();
-    }.bind(this));
+    }.bind(this), function() {});
   },
   'checkMayRead': function(test) {
     setUp.bind(this)();
@@ -198,7 +198,7 @@ exports['requests'] = nodeunit.testCase({
       this.req.headers.authorization = 'asdfqwer-wrong';
       this.requestsInstance.checkMayRead(this.req, this.res, 'me', '/qwer/asdf/read', function(err, answer) {
         test.equal(true, false);
-      }.bind(this));
+      }.bind(this), function() {});
       test.equal(this.scopesMock._mayReadCalled, 2);
       test.equal(this.res._status, 401);
       test.deepEqual(this.res._headers, {
@@ -230,7 +230,7 @@ exports['requests'] = nodeunit.testCase({
       this.req.headers.authorization = 'asdfqwer-wrong';
       this.requestsInstance.checkMayWrite(this.req, this.res, 'me', '/qwer/asdf/write', function(err, answer) {
         test.equal(false, true);
-      });
+      }, function() {});
       test.equal(this.scopesMock._mayWriteCalled, 2);
       test.equal(this.res._status, 401);
       test.deepEqual(this.res._headers, {
@@ -279,7 +279,7 @@ exports['requests'] = nodeunit.testCase({
       this.req.headers['if-match'] = 'aap';
       this.requestsInstance.checkCondMet(this.req, this.res, 'me', '/qwer/asdf/cond', 409, function(err, answer) {
         test.equal(false, true);
-      });
+      }, function() {});
       test.equal(this.mainMock._condMetCalled, 2);
       test.equal(this.res._status, 409);
       test.deepEqual(this.res._headers, {
@@ -312,7 +312,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._ended, false);
       this.requestsInstance.checkFound(this.req, this.res, 'me', '/non-existing', false, function(err, answer) {
         test.equal(false, true);
-      });
+      }, function() {});
       test.equal(this.mainMock._existsCalled, 2);
       test.equal(this.res._status, 404);
       test.deepEqual(this.res._headers, {
