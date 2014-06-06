@@ -302,7 +302,7 @@ exports['requests'] = nodeunit.testCase({
     this.req.headers = {
       origin: 'http://local.host'
     };
-    this.requestsInstance.checkFound(this.req, this.res, 'me', '/existing', function(err, answer) {
+    this.requestsInstance.checkFound(this.req, this.res, 'me', '/existing', false, function(err, answer) {
       test.equal(err, null);
       test.equal(answer, true);
       test.equal(this.mainMock._existsCalled, 1);
@@ -310,7 +310,7 @@ exports['requests'] = nodeunit.testCase({
       test.equal(this.res._headers, undefined);
       test.equal(this.res._body, '');
       test.equal(this.res._ended, false);
-      this.requestsInstance.checkFound(this.req, this.res, 'me', '/non-existing', function(err, answer) {
+      this.requestsInstance.checkFound(this.req, this.res, 'me', '/non-existing', false, function(err, answer) {
         test.equal(false, true);
       });
       test.equal(this.mainMock._existsCalled, 2);
