@@ -1,3 +1,7 @@
+# 0.5.8 (Jun 2014)
+* add support for draft-dejong-remotestorage-03
+* fix tests
+
 # 0.5.7 (May 2014)
 * fix cases where requests stayed pending without being serviced
 
