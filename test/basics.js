@@ -20,7 +20,8 @@ exports['RemotestorageServer constuctor supports version string "draft-dejong-re
   test.equal(!!server, true);
   test.done();
 };
-exports['RemotestorageServer constuctor throws an error for unknown version strings'] = function(test) {
-  test.throws(function() {new RemotestorageServer('draft-dejong-remotestorage-04', {}, {})});
+exports['RemotestorageServer constuctor supports version string "draft-dejong-remotestorage-04"'] = function(test) {
+  var server = new RemotestorageServer('draft-dejong-remotestorage-03', {}, {});
+  test.equal(!!server, true);
   test.done();
 };
