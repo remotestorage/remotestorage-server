@@ -1,3 +1,6 @@
+# 0.5.10 (Sep 2014)
+* make draft-dejong-remotestorage-04 (rc3) the default behavior
+
 # 0.5.9 (Jun 2014)
 * fix two mistakes in the empty-folder implementation
 
