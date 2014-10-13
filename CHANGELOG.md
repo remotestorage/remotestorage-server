@@ -1,3 +1,6 @@
+# 0.5.11 (Oct 2014)
+* add backdoor for initializing data like web-authoring apps
+
 # 0.5.10 (Sep 2014)
 * make draft-dejong-remotestorage-04 (rc3) the default behavior
 
